@@ -30,8 +30,8 @@
       border-color: #e2e8f0 !important;
       user-select: none;
     }
-    input, textarea { outline: none; transition: all 0.2s; }
-    input:focus, textarea:focus { background-color: #fffbeb !important; }
+    input, textarea, select { outline: none; transition: all 0.2s; }
+    input:focus, textarea:focus, select:focus { background-color: #fffbeb !important; }
     .emp-input {
       resize: vertical;
       min-height: 48px;
@@ -53,12 +53,66 @@
       border: 1px solid #cbd5e1;
       border-radius: 4px;
     }
+
+    .table-official {
+      width: 100%;
+      border: 2px solid #000;
+      border-collapse: collapse;
+    }
+    .table-official th, .table-official td {
+      border: 1.5px solid #000;
+      padding: 6px;
+      vertical-align: top;
+    }
+    .table-official th {
+      background-color: #d9e2b3;
+      color: #1a2e05;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    /* إعدادات الطباعة المتناسقة المدمجة */
+    @page {
+      size: A4 landscape;
+      margin: 6mm 5mm;
+    }
     @media print {
       .no-print { display: none !important; }
-      body { background: white !important; font-size: 11px; }
-      .print-shadow-none { box-shadow: none !important; border: 1px solid #cbd5e1 !important; }
-      input, textarea { border: none !important; resize: none; background: transparent !important; }
+      body { background: white !important; font-size: 9.5px !important; color: black !important; padding: 0 !important; }
+      main { width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 0 !important; box-shadow: none !important; border: none !important; }
+      
+      .print-section-page {
+        page-break-before: always !important;
+        break-before: page !important;
+      }
+      .avoid-page-break {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+
+      .table-custom { font-size: 8.5px !important; width: 100% !important; }
+      .table-custom th, .table-custom td { padding: 2px 1px !important; }
+      
+      .table-official { font-size: 9px !important; width: 100% !important; }
+      .table-official th, .table-official td { padding: 3px 2px !important; }
+
+      .print-text-block {
+        display: block !important;
+        white-space: pre-wrap !important;
+        word-break: break-word !important;
+        text-align: right !important;
+        font-size: 9px !important;
+        line-height: 1.3 !important;
+        padding: 1px !important;
+      }
+      .hide-on-print {
+        display: none !important;
+      }
+      .compact-print-space {
+        margin-bottom: 6px !important;
+      }
     }
+    .print-text-block { display: none; }
   </style>
 </head>
 <body class="min-h-screen">
@@ -69,18 +123,18 @@
       <div class="bg-slate-900 p-6 text-center text-white">
         <div class="inline-block bg-amber-500 text-slate-950 font-black px-4 py-1 rounded-lg text-lg mb-2">مدارس البيارق الأهلية</div>
         <h2 class="text-base font-bold">بوابة التقرير الأسبوعي الموحد</h2>
-        <p class="text-xs text-slate-400 mt-1">يرجى تسجيل الدخول بحساب المرحلة أو الإدارة أو الإشراف</p>
+        <p class="text-xs text-slate-400 mt-1">يرجى إدخال اسم المستخدم وكلمة المرور الخاصة بك</p>
       </div>
       
-      <form onsubmit="handleLogin(event)" class="p-6 space-y-4">
+      <form onsubmit="handleLogin(event)" autocomplete="off" class="p-6 space-y-4">
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1">اسم المستخدم:</label>
-          <input type="text" id="usernameInput" placeholder="أدخل اسم المستخدم" required 
+          <input type="text" id="usernameInput" placeholder="أدخل اسم المستخدم" required autocomplete="off"
                  class="w-full text-sm p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500">
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1">كلمة المرور:</label>
-          <input type="password" id="passwordInput" placeholder="أدخل كلمة المرور" required 
+          <input type="password" id="passwordInput" placeholder="أدخل كلمة المرور" required autocomplete="new-password"
                  class="w-full text-sm p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500">
         </div>
         <div id="loginError" class="hidden text-xs text-rose-600 font-bold bg-rose-50 p-2 rounded border border-rose-200 text-center">
@@ -93,23 +147,23 @@
     </div>
   </div>
 
-  <!-- نافذة تغيير كلمة المرور المعتمدة لجميع المستخدمين -->
+  <!-- نافذة تغيير كلمة المرور -->
   <div id="changePassModal" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl overflow-hidden border border-slate-200">
       <div class="bg-slate-800 p-4 text-white flex justify-between items-center">
-        <h3 class="text-sm font-bold">تغيير كلمة المرور الخاصة بك</h3>
+        <h3 class="text-sm font-bold">تغيير كلمة المرور الخاصة بحسابك</h3>
         <button onclick="toggleChangePassModal(false)" class="text-slate-400 hover:text-white text-lg">&times;</button>
       </div>
-      <form onsubmit="saveNewPassword(event)" class="p-4 space-y-3">
+      <form onsubmit="saveNewPassword(event)" autocomplete="off" class="p-4 space-y-3">
         <div>
           <label class="block text-xs text-slate-600 mb-1">كلمة المرور الجديدة:</label>
-          <input type="password" id="newPasswordInput" required placeholder="أدخل كلمة المرور الجديدة" class="w-full text-sm p-2 border rounded focus:ring-2 focus:ring-amber-500">
+          <input type="password" id="newPasswordInput" required placeholder="أدخل كلمة المرور الجديدة" autocomplete="new-password" class="w-full text-sm p-2 border rounded focus:ring-2 focus:ring-amber-500">
         </div>
         <div id="passChangeSuccess" class="hidden text-xs text-emerald-600 font-bold bg-emerald-50 p-2 rounded text-center">
           تم تحديث كلمة المرور في السيرفر بنجاح!
         </div>
         <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2 rounded text-xs transition shadow">
-          حفظ التغيير سحابياً
+          حفظ كلمة المرور الجديدة
         </button>
       </form>
     </div>
@@ -123,7 +177,11 @@
         <h1 class="text-xs md:text-sm font-bold">تقرير المتابعة الأسبوعي - أقسام البنين</h1>
       </div>
 
-      <div class="flex items-center gap-2 md:gap-3">
+      <div class="flex items-center gap-2 md:gap-3 flex-wrap">
+        <div id="lockStatusBanner" class="hidden text-[11px] bg-rose-500/20 text-rose-300 border border-rose-500/40 px-2 py-1 rounded font-bold">
+          🔒 التقرير مقفل بقرار المشرف العام
+        </div>
+
         <div id="saveBadge" class="hidden text-[11px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2 py-1 rounded">
           تم المزامنة السحابية ✓
         </div>
@@ -134,23 +192,27 @@
           <span id="currentRoleTitle" class="text-xs md:text-sm font-bold text-amber-400">زائر</span>
         </div>
 
-        <button onclick="toggleChangePassModal(true)" class="bg-slate-700 hover:bg-slate-600 text-amber-300 text-xs font-bold px-2.5 py-1.5 rounded-lg transition" title="تغيير كلمة المرور الخاصة بحسابك">
+        <button id="adminLockToggleBtn" onclick="toggleReportLock()" class="no-print hidden bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-2.5 py-1.5 rounded-lg transition flex items-center gap-1 shadow" title="قفل أو فتح تعديلات التقرير للجميع">
+          <span id="lockBtnIcon">🔒</span> <span id="lockBtnText">قفل التقرير</span>
+        </button>
+
+        <button onclick="toggleChangePassModal(true)" class="no-print bg-slate-700 hover:bg-slate-600 text-amber-300 text-xs font-bold px-2.5 py-1.5 rounded-lg transition" title="تغيير كلمة المرور">
           🔑 الباسورد
         </button>
 
-        <button id="clearAllTopBtn" onclick="clearFullWeekReport()" data-stage="admin" class="bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold px-2.5 py-1.5 rounded-lg transition hidden flex items-center gap-1 shadow" title="محو جميع البيانات لبدء أسبوع جديد">
+        <button id="clearAllTopBtn" onclick="clearFullWeekReport()" data-stage="admin" class="no-print bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold px-2.5 py-1.5 rounded-lg transition hidden flex items-center gap-1 shadow" title="محو جميع البيانات لبدء أسبوع جديد">
           <span>🗑️</span> أسبوع جديد
         </button>
 
-        <button onclick="manualSave()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition flex items-center gap-1 shadow">
+        <button onclick="manualSave()" class="no-print bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition flex items-center gap-1 shadow">
           <span>💾</span> حفظ
         </button>
 
-        <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition flex items-center gap-1 shadow">
-          <span>🖨️</span> طباعة / PDF
+        <button onclick="triggerSmartPrint()" class="no-print bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition flex items-center gap-1 shadow">
+          <span>🖨️</span> طباعة كاملة / PDF
         </button>
 
-        <button onclick="logout()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition">
+        <button onclick="logout()" class="no-print bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition">
           خروج
         </button>
       </div>
@@ -160,8 +222,8 @@
   <!-- جسم التقرير -->
   <main class="max-w-7xl mx-auto p-4 md:p-6 my-4 bg-white rounded-xl shadow print-shadow-none">
 
-    <!-- الترويسة وبها منطقة الشعار التفاعلية -->
-    <div class="border-b-2 border-slate-800 pb-4 mb-6">
+    <!-- الترويسة وبها خيارات تعديل الأسبوع والتاريخ والفصل بنقرة زر -->
+    <div class="border-b-2 border-slate-800 pb-4 mb-6 avoid-page-break">
       <div class="flex justify-between items-center text-center">
         <div class="text-right">
           <h2 class="text-base md:text-lg font-bold text-slate-800">المملكة العربية السعودية</h2>
@@ -174,11 +236,33 @@
           </h3>
           <div class="mt-3 flex flex-wrap items-center justify-center gap-2 text-xs font-bold text-slate-700">
             <span>الفصل:</span>
-            <input type="text" id="term_info" value="الفصل الدراسي الثاني" data-stage="admin" oninput="handleInput(this)" class="border rounded px-2 py-0.5 text-center w-36">
+            <select id="term_info" onchange="handleInput(this)" class="border rounded px-2 py-1 text-center bg-white cursor-pointer font-bold">
+              <option value="الفصل الدراسي الأول">الفصل الدراسي الأول</option>
+              <option value="الفصل الدراسي الثاني" selected>الفصل الدراسي الثاني</option>
+              <option value="الفصل الدراسي الثالث">الفصل الدراسي الثالث</option>
+            </select>
+
             <span>الأسبوع:</span>
-            <input type="text" id="week_no" value="16" data-stage="admin" oninput="handleInput(this)" class="border rounded px-1.5 py-0.5 text-center w-12 font-black text-amber-600">
+            <div class="flex items-center gap-1">
+              <button type="button" onclick="stepWeekNumber(-1)" class="no-print bg-slate-200 hover:bg-amber-500 hover:text-slate-950 font-black px-2 py-0.5 rounded transition text-xs" title="الأسبوع السابق">◀</button>
+              <select id="week_no" onchange="handleInput(this)" class="border rounded px-2 py-1 text-center font-black text-amber-600 bg-white cursor-pointer text-xs">
+                <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
+                <option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                <option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16" selected>16</option>
+                <option value="17">17</option><option value="18">18</option>
+              </select>
+              <button type="button" onclick="stepWeekNumber(1)" class="no-print bg-slate-200 hover:bg-amber-500 hover:text-slate-950 font-black px-2 py-0.5 rounded transition text-xs" title="الأسبوع التالي">▶</button>
+            </div>
+
             <span>التاريخ:</span>
-            <input type="text" id="date_range" value="من 14 /12 - 18 / 12/ 1447هـ (31 /5 - 4 / 6 / 2026م)" data-stage="admin" oninput="handleInput(this)" class="border rounded px-2 py-0.5 text-center w-72">
+            <div class="flex items-center gap-1">
+              <input type="text" id="date_range" value="من 14 /12 - 18 / 12/ 1447هـ (31 /5 - 4 / 6 / 2026م)" oninput="handleInput(this)" class="border rounded px-2 py-1 text-center w-72 bg-white text-xs">
+              <label class="no-print cursor-pointer bg-slate-800 hover:bg-slate-700 text-amber-300 px-2 py-1 rounded shadow text-xs flex items-center gap-1 font-bold" title="اختر تاريخ الأحد ليتم حساب نطاق الأسبوع كاملاً">
+                <span>📅 اختر الأحد</span>
+                <input type="date" id="weekDatePicker" onchange="calculateWeekDateRange(this.value)" class="hidden">
+              </label>
+            </div>
           </div>
         </div>
         <div class="text-left flex flex-col items-center justify-end relative group">
@@ -216,52 +300,8 @@
       </div>
     </div>
 
-    <!-- بطاقات التوصيات لكل مرحلة -->
-    <div id="recommendationCardsGrid" class="mb-6 grid grid-cols-1 md:grid-cols-4 gap-3">
-      <div id="rec_card_primary" class="border border-slate-200 rounded-lg p-2.5 bg-slate-50">
-        <div class="flex justify-between items-center mb-1.5">
-          <span class="text-xs font-bold text-slate-800">توصية (الابتدائي)</span>
-          <span id="badge_primary" class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-200 text-slate-700">عادي</span>
-        </div>
-        <textarea id="comm_primary" placeholder="توصية المشرف العام لمدير الابتدائي..." rows="2" data-stage="admin" oninput="handleInput(this)" class="w-full text-[11px] p-1.5 border rounded mb-2"></textarea>
-        <div class="flex justify-start" data-stage="admin">
-          <button type="button" onclick="toggleRewardAction('primary')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold py-1 px-3 rounded shadow-sm">🟢 شكر وتقدير</button>
-        </div>
-      </div>
-      <div id="rec_card_middle" class="border border-slate-200 rounded-lg p-2.5 bg-slate-50">
-        <div class="flex justify-between items-center mb-1.5">
-          <span class="text-xs font-bold text-slate-800">توصية (المتوسط)</span>
-          <span id="badge_middle" class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-200 text-slate-700">عادي</span>
-        </div>
-        <textarea id="comm_middle" placeholder="توصية المشرف العام لمدير المتوسط..." rows="2" data-stage="admin" oninput="handleInput(this)" class="w-full text-[11px] p-1.5 border rounded mb-2"></textarea>
-        <div class="flex justify-start" data-stage="admin">
-          <button type="button" onclick="toggleRewardAction('middle')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold py-1 px-3 rounded shadow-sm">🟢 شكر وتقدير</button>
-        </div>
-      </div>
-      <div id="rec_card_secondary" class="border border-slate-200 rounded-lg p-2.5 bg-slate-50">
-        <div class="flex justify-between items-center mb-1.5">
-          <span class="text-xs font-bold text-slate-800">توصية (الثانوي)</span>
-          <span id="badge_secondary" class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-200 text-slate-700">عادي</span>
-        </div>
-        <textarea id="comm_secondary" placeholder="توصية المشرف العام لمدير الثانوي..." rows="2" data-stage="admin" oninput="handleInput(this)" class="w-full text-[11px] p-1.5 border rounded mb-2"></textarea>
-        <div class="flex justify-start" data-stage="admin">
-          <button type="button" onclick="toggleRewardAction('secondary')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold py-1 px-3 rounded shadow-sm">🟢 شكر وتقدير</button>
-        </div>
-      </div>
-      <div id="rec_card_special" class="border border-slate-200 rounded-lg p-2.5 bg-slate-50">
-        <div class="flex justify-between items-center mb-1.5">
-          <span class="text-xs font-bold text-slate-800">توصية (التربية الخاصة)</span>
-          <span id="badge_special" class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-200 text-slate-700">عادي</span>
-        </div>
-        <textarea id="comm_special" placeholder="توصية المشرف العام لمدير التربية الخاصة..." rows="2" data-stage="admin" oninput="handleInput(this)" class="w-full text-[11px] p-1.5 border rounded mb-2"></textarea>
-        <div class="flex justify-start" data-stage="admin">
-          <button type="button" onclick="toggleRewardAction('special')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold py-1 px-3 rounded shadow-sm">🟢 شكر وتقدير</button>
-        </div>
-      </div>
-    </div>
-
     <!-- 1. غياب الطلاب -->
-    <section class="mb-6">
+    <section class="mb-6 avoid-page-break">
       <h4 class="text-sm font-bold bg-slate-800 text-white px-3 py-1.5 rounded-t-lg">
         📊 1. غياب الطلاب
       </h4>
@@ -280,7 +320,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr data-stage="primary">
+            <tr>
               <td class="font-bold bg-slate-50">ابتدائي</td>
               <td><input type="number" id="stu_total_primary" value="293" oninput="handleInput(this); calcStudentAbsence('primary')" class="w-full text-center font-bold"></td>
               <td><input type="number" id="stu_sun_primary" placeholder="-" oninput="handleInput(this); calcStudentAbsence('primary')" class="w-full text-center"></td>
@@ -290,7 +330,7 @@
               <td><input type="number" id="stu_thu_primary" value="283" oninput="handleInput(this); calcStudentAbsence('primary')" class="w-full text-center"></td>
               <td id="stu_perc_primary" class="font-bold bg-amber-50 text-amber-800">80.2%</td>
             </tr>
-            <tr data-stage="middle">
+            <tr>
               <td class="font-bold bg-slate-50">متوسط</td>
               <td><input type="number" id="stu_total_middle" value="180" oninput="handleInput(this); calcStudentAbsence('middle')" class="w-full text-center font-bold"></td>
               <td><input type="number" id="stu_sun_middle" placeholder="-" oninput="handleInput(this); calcStudentAbsence('middle')" class="w-full text-center"></td>
@@ -300,7 +340,7 @@
               <td><input type="number" id="stu_thu_middle" value="175" oninput="handleInput(this); calcStudentAbsence('middle')" class="w-full text-center"></td>
               <td id="stu_perc_middle" class="font-bold bg-amber-50 text-amber-800">46.0%</td>
             </tr>
-            <tr data-stage="secondary">
+            <tr>
               <td class="font-bold bg-slate-50">ثانوي</td>
               <td><input type="number" id="stu_total_secondary" placeholder="-" oninput="handleInput(this); calcStudentAbsence('secondary')" class="w-full text-center font-bold"></td>
               <td><input type="number" id="stu_sun_secondary" placeholder="-" oninput="handleInput(this); calcStudentAbsence('secondary')" class="w-full text-center"></td>
@@ -310,7 +350,7 @@
               <td><input type="number" id="stu_thu_secondary" placeholder="-" oninput="handleInput(this); calcStudentAbsence('secondary')" class="w-full text-center"></td>
               <td id="stu_perc_secondary" class="font-bold bg-amber-50 text-amber-800">-</td>
             </tr>
-            <tr data-stage="special">
+            <tr>
               <td class="font-bold bg-slate-50">تربية خاصة</td>
               <td><input type="number" id="stu_total_special" value="225" oninput="handleInput(this); calcStudentAbsence('special')" class="w-full text-center font-bold"></td>
               <td><input type="number" id="stu_sun_special" placeholder="-" oninput="handleInput(this); calcStudentAbsence('special')" class="w-full text-center"></td>
@@ -323,26 +363,26 @@
           </tbody>
         </table>
       </div>
-      <div class="mt-2 bg-slate-50 p-2 rounded border" data-stage="admin">
+      <div class="mt-2 bg-slate-50 p-2 rounded border">
         <label class="block text-xs font-bold text-slate-700 mb-1">توصيات المشرف العام وإدارة الإشراف (غياب الطلاب):</label>
-        <textarea id="admin_action_stu" rows="2" oninput="handleInput(this)" class="w-full text-xs p-1.5 border rounded">حث المدراء على تكثيف المتابعة لحضور الطلاب للأسبوع القادم ومتابعة المراجعة للطلاب. تم التأكيد على مدراء الأقسام بمتابعة التحصيل وإعدادات الحفل الختامي لبقية المراحل والنهائي للقسم الثانوي.</textarea>
+        <textarea id="admin_action_stu" rows="2" data-owner="admin" oninput="handleInput(this)" class="w-full text-xs p-1 border rounded"></textarea>
       </div>
     </section>
 
-    <!-- 2. غياب وتأخر الموظفين -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-      <div>
-        <div class="flex justify-between items-center bg-slate-800 text-white px-3 py-1.5 rounded-t-lg">
-          <h4 class="text-xs md:text-sm font-bold">👥 2. غياب الموظفين</h4>
-          <span class="text-[10px] text-amber-300 font-normal">اضغط Enter لإضافة أكثر من معلم</span>
-        </div>
+    <!-- 2. غياب الموظفين -->
+    <section class="mb-6 avoid-page-break">
+      <div class="flex justify-between items-center bg-slate-800 text-white px-3 py-1.5 rounded-t-lg">
+        <h4 class="text-xs md:text-sm font-bold">👥 2. غياب الموظفين</h4>
+        <span class="text-[10px] text-amber-300 font-normal">اضغط Enter لإضافة أكثر من معلم</span>
+      </div>
+      <div class="overflow-x-auto">
         <table class="table-custom text-xs">
           <thead>
-            <tr><th>المرحلة</th><th>الأحد</th><th>الاثنين</th><th>الثلاثاء</th><th>الأربعاء</th><th>الخميس</th><th>المعالجات - توصيات المدير</th></tr>
+            <tr><th class="w-24">المرحلة</th><th>الأحد</th><th>الاثنين</th><th>الثلاثاء</th><th>الأربعاء</th><th>الخميس</th><th class="w-1/4">المعالجات - توصيات المدير</th></tr>
           </thead>
           <tbody>
-            <tr data-stage="primary">
-              <td class="font-bold">ابتدائي</td>
+            <tr>
+              <td class="font-bold bg-slate-50">ابتدائي</td>
               <td><textarea id="emp_abs_p_1" placeholder="-" oninput="handleInput(this)" class="emp-input"></textarea></td>
               <td><textarea id="emp_abs_p_2" placeholder="-" oninput="handleInput(this)" class="emp-input"></textarea></td>
               <td><textarea id="emp_abs_p_3" placeholder="-" oninput="handleInput(this)" class="emp-input"></textarea></td>
@@ -350,8 +390,8 @@
               <td><textarea id="emp_abs_p_5" placeholder="-" oninput="handleInput(this)" class="emp-input"></textarea></td>
               <td><textarea id="emp_abs_p_act" placeholder="التوصيات" oninput="handleInput(this)" class="emp-input"></textarea></td>
             </tr>
-            <tr data-stage="middle">
-              <td class="font-bold">متوسط</td>
+            <tr>
+              <td class="font-bold bg-slate-50">متوسط</td>
               <td><textarea id="emp_abs_m_1" placeholder="-" oninput="handleInput(this)" class="emp-input"></textarea></td>
               <td><textarea id="emp_abs_m_2" placeholder="-" oninput="handleInput(this)" class="emp-input"></textarea></td>
               <td><textarea id="emp_abs_m_3" placeholder="-" oninput="handleInput(this)" class="emp-input"></textarea></td>
@@ -359,8 +399,8 @@
               <td><textarea id="emp_abs_m_5" placeholder="-" oninput="handleInput(this)" class="emp-input"></textarea></td>
               <td><textarea id="emp_abs_m_act" placeholder="التوصيات" oninput="handleInput(this)" class="emp-input"></textarea></td>
             </tr>
-            <tr data-stage="secondary">
-              <td class="font-bold">ثانوي</td>
+            <tr>
+              <td class="font-bold bg-slate-50">ثانوي</td>
               <td><textarea id="emp_abs_s_1" placeholder="-" oninput="handleInput(this)" class="emp-input"></textarea></td>
               <td><textarea id="emp_abs_s_2" placeholder="-" oninput="handleInput(this)" class="emp-input"></textarea></td>
               <td><textarea id="emp_abs_s_3" placeholder="-" oninput="handleInput(this)" class="emp-input"></textarea></td>
@@ -368,36 +408,38 @@
               <td><textarea id="emp_abs_s_5" placeholder="-" oninput="handleInput(this)" class="emp-input"></textarea></td>
               <td><textarea id="emp_abs_s_act" placeholder="التوصيات" oninput="handleInput(this)" class="emp-input"></textarea></td>
             </tr>
-            <tr data-stage="special">
-              <td class="font-bold">تربية خاصة</td>
-              <td><textarea id="emp_abs_sp_1" placeholder="-" oninput="handleInput(this)" class="emp-input">-</textarea></td>
-              <td><textarea id="emp_abs_sp_2" placeholder="-" oninput="handleInput(this)" class="emp-input">-</textarea></td>
-              <td><textarea id="emp_abs_sp_3" oninput="handleInput(this)" class="emp-input">عبدالعزيز الاسمري</textarea></td>
-              <td><textarea id="emp_abs_sp_4" placeholder="-" oninput="handleInput(this)" class="emp-input">-</textarea></td>
-              <td><textarea id="emp_abs_sp_5" oninput="handleInput(this)" class="emp-input">سامي كعبي</textarea></td>
-              <td><textarea id="emp_abs_sp_act" oninput="handleInput(this)" class="emp-input">مساءلة واجتماع لفهم أسباب الغياب</textarea></td>
+            <tr>
+              <td class="font-bold bg-slate-50">تربية خاصة</td>
+              <td><textarea id="emp_abs_sp_1" placeholder="-" oninput="handleInput(this)" class="emp-input"></textarea></td>
+              <td><textarea id="emp_abs_sp_2" placeholder="-" oninput="handleInput(this)" class="emp-input"></textarea></td>
+              <td><textarea id="emp_abs_sp_3" oninput="handleInput(this)" class="emp-input"></textarea></td>
+              <td><textarea id="emp_abs_sp_4" placeholder="-" oninput="handleInput(this)" class="emp-input"></textarea></td>
+              <td><textarea id="emp_abs_sp_5" oninput="handleInput(this)" class="emp-input"></textarea></td>
+              <td><textarea id="emp_abs_sp_act" oninput="handleInput(this)" class="emp-input"></textarea></td>
             </tr>
           </tbody>
         </table>
-        <div class="mt-2 bg-slate-50 p-1.5 rounded border" data-stage="admin">
-          <label class="block text-[11px] font-bold text-slate-700 mb-0.5">توصيات المشرف العام وإدارة الإشراف:</label>
-          <input type="text" id="admin_action_emp_abs" value="تمت المعايدة بين الأقسام كل قسم في قسمه والتأكيد على تسليم الاختبارات النهائية" oninput="handleInput(this)" class="w-full text-xs p-1 border rounded">
-        </div>
       </div>
+      <div class="mt-2 bg-slate-50 p-1.5 rounded border">
+        <label class="block text-[11px] font-bold text-slate-700 mb-0.5">توصيات المشرف العام وإدارة الإشراف (غياب الموظفين):</label>
+        <input type="text" id="admin_action_emp_abs" data-owner="admin" oninput="handleInput(this)" class="w-full text-xs p-1 border rounded">
+      </div>
+    </section>
 
-      <!-- تأخر الموظفين -->
-      <div>
-        <div class="flex justify-between items-center bg-slate-800 text-white px-3 py-1.5 rounded-t-lg">
-          <h4 class="text-xs md:text-sm font-bold">⏰ 3. تأخر الموظفين</h4>
-          <span class="text-[10px] text-amber-300 font-normal">اضغط Enter لإضافة أكثر من معلم</span>
-        </div>
+    <!-- 3. تأخر الموظفين -->
+    <section class="mb-6 avoid-page-break">
+      <div class="flex justify-between items-center bg-slate-800 text-white px-3 py-1.5 rounded-t-lg">
+        <h4 class="text-xs md:text-sm font-bold">⏰ 3. تأخر الموظفين</h4>
+        <span class="text-[10px] text-amber-300 font-normal">اضغط Enter لإضافة أكثر من معلم</span>
+      </div>
+      <div class="overflow-x-auto">
         <table class="table-custom text-xs">
           <thead>
-            <tr><th>المرحلة</th><th>الأحد</th><th>الاثنين</th><th>الثلاثاء</th><th>الأربعاء</th><th>الخميس</th><th>المعالجات - توصيات المدير</th></tr>
+            <tr><th class="w-24">المرحلة</th><th>الأحد</th><th>الاثنين</th><th>الثلاثاء</th><th>الأربعاء</th><th>الخميس</th><th class="w-1/4">المعالجات - توصيات المدير</th></tr>
           </thead>
           <tbody>
-            <tr data-stage="primary">
-              <td class="font-bold">ابتدائي</td>
+            <tr>
+              <td class="font-bold bg-slate-50">ابتدائي</td>
               <td><textarea id="emp_lat_p_1" placeholder="-" oninput="handleInput(this)" class="emp-input"></textarea></td>
               <td><textarea id="emp_lat_p_2" placeholder="-" oninput="handleInput(this)" class="emp-input"></textarea></td>
               <td><textarea id="emp_lat_p_3" placeholder="-" oninput="handleInput(this)" class="emp-input"></textarea></td>
@@ -405,17 +447,17 @@
               <td><textarea id="emp_lat_p_5" placeholder="-" oninput="handleInput(this)" class="emp-input"></textarea></td>
               <td><textarea id="emp_lat_p_act" placeholder="التوصيات" oninput="handleInput(this)" class="emp-input"></textarea></td>
             </tr>
-            <tr data-stage="middle">
-              <td class="font-bold">متوسط</td>
+            <tr>
+              <td class="font-bold bg-slate-50">متوسط</td>
               <td><textarea id="emp_lat_m_1" placeholder="-" oninput="handleInput(this)" class="emp-input"></textarea></td>
               <td><textarea id="emp_lat_m_2" placeholder="-" oninput="handleInput(this)" class="emp-input"></textarea></td>
-              <td><textarea id="emp_lat_m_3" oninput="handleInput(this)" class="emp-input">مشاري الرشيدي</textarea></td>
-              <td><textarea id="emp_lat_m_4" oninput="handleInput(this)" class="emp-input">محمد الحارثي</textarea></td>
-              <td><textarea id="emp_lat_m_5" oninput="handleInput(this)" class="emp-input">محمد الحارثي</textarea></td>
-              <td><textarea id="emp_lat_m_act" oninput="handleInput(this)" class="emp-input">مساءلة + لقاء فردي</textarea></td>
+              <td><textarea id="emp_lat_m_3" oninput="handleInput(this)" class="emp-input"></textarea></td>
+              <td><textarea id="emp_lat_m_4" oninput="handleInput(this)" class="emp-input"></textarea></td>
+              <td><textarea id="emp_lat_m_5" oninput="handleInput(this)" class="emp-input"></textarea></td>
+              <td><textarea id="emp_lat_m_act" oninput="handleInput(this)" class="emp-input"></textarea></td>
             </tr>
-            <tr data-stage="secondary">
-              <td class="font-bold">ثانوي</td>
+            <tr>
+              <td class="font-bold bg-slate-50">ثانوي</td>
               <td><textarea id="emp_lat_s_1" placeholder="-" oninput="handleInput(this)" class="emp-input"></textarea></td>
               <td><textarea id="emp_lat_s_2" placeholder="-" oninput="handleInput(this)" class="emp-input"></textarea></td>
               <td><textarea id="emp_lat_s_3" placeholder="-" oninput="handleInput(this)" class="emp-input"></textarea></td>
@@ -423,113 +465,75 @@
               <td><textarea id="emp_lat_s_5" placeholder="-" oninput="handleInput(this)" class="emp-input"></textarea></td>
               <td><textarea id="emp_lat_s_act" placeholder="التوصيات" oninput="handleInput(this)" class="emp-input"></textarea></td>
             </tr>
-            <tr data-stage="special">
-              <td class="font-bold">تربية خاصة</td>
-              <td><textarea id="emp_lat_sp_1" placeholder="-" oninput="handleInput(this)" class="emp-input">-</textarea></td>
-              <td><textarea id="emp_lat_sp_2" placeholder="-" oninput="handleInput(this)" class="emp-input">-</textarea></td>
-              <td><textarea id="emp_lat_sp_3" oninput="handleInput(this)" class="emp-input">مهند ال فقيه</textarea></td>
-              <td><textarea id="emp_lat_sp_4" placeholder="-" oninput="handleInput(this)" class="emp-input">-</textarea></td>
-              <td><textarea id="emp_lat_sp_5" placeholder="-" oninput="handleInput(this)" class="emp-input">-</textarea></td>
-              <td><textarea id="emp_lat_sp_act" oninput="handleInput(this)" class="emp-input">اجتماع لفهم أسباب التأخر</textarea></td>
+            <tr>
+              <td class="font-bold bg-slate-50">تربية خاصة</td>
+              <td><textarea id="emp_lat_sp_1" placeholder="-" oninput="handleInput(this)" class="emp-input"></textarea></td>
+              <td><textarea id="emp_lat_sp_2" placeholder="-" oninput="handleInput(this)" class="emp-input"></textarea></td>
+              <td><textarea id="emp_lat_sp_3" oninput="handleInput(this)" class="emp-input"></textarea></td>
+              <td><textarea id="emp_lat_sp_4" placeholder="-" oninput="handleInput(this)" class="emp-input"></textarea></td>
+              <td><textarea id="emp_lat_sp_5" placeholder="-" oninput="handleInput(this)" class="emp-input"></textarea></td>
+              <td><textarea id="emp_lat_sp_act" oninput="handleInput(this)" class="emp-input"></textarea></td>
             </tr>
           </tbody>
         </table>
-        <div class="mt-2 bg-slate-50 p-1.5 rounded border" data-stage="admin">
-          <label class="block text-[11px] font-bold text-slate-700 mb-0.5">توصيات المشرف العام وإدارة الإشراف:</label>
-          <input type="text" id="admin_action_emp_lat" value="الإجراءات المعتادة" oninput="handleInput(this)" class="w-full text-xs p-1 border rounded">
-        </div>
       </div>
-    </div>
+      <div class="mt-2 bg-slate-50 p-1.5 rounded border">
+        <label class="block text-[11px] font-bold text-slate-700 mb-0.5">توصيات المشرف العام وإدارة الإشراف (تأخر الموظفين):</label>
+        <input type="text" id="admin_action_emp_lat" data-owner="admin" oninput="handleInput(this)" class="w-full text-xs p-1 border rounded">
+      </div>
+    </section>
 
     <!-- 4. البرامج الإرشادية ورعاية الحالات -->
-    <section class="mb-6">
+    <section class="mb-6 avoid-page-break">
       <h4 class="text-xs md:text-sm font-bold bg-slate-800 text-white px-3 py-1.5 rounded-t-lg">
         🧠 4. البرامج الإرشادية ورعاية الحالات
       </h4>
-      <table class="table-custom text-xs md:text-sm">
-        <thead>
-          <tr><th class="w-40">البيان</th><th>ابتدائي</th><th>متوسط</th><th>ثانوي</th><th>تربية خاصة</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="font-bold bg-slate-50">الحالات الصحية</td>
-            <td data-stage="primary"><textarea id="guid_h_p" rows="2" oninput="handleInput(this)" class="w-full p-1 border rounded">طالب مصاب بالسكر</textarea></td>
-            <td data-stage="middle"><textarea id="guid_h_m" rows="2" oninput="handleInput(this)" class="w-full p-1 border rounded">-</textarea></td>
-            <td data-stage="secondary"><textarea id="guid_h_s" rows="2" oninput="handleInput(this)" class="w-full p-1 border rounded"></textarea></td>
-            <td data-stage="special"><textarea id="guid_h_sp" rows="2" oninput="handleInput(this)" class="w-full p-1 border rounded">-</textarea></td>
-          </tr>
-          <tr>
-            <td class="font-bold bg-slate-50">الحالات النفسية</td>
-            <td data-stage="primary"><textarea id="guid_p_p" rows="2" oninput="handleInput(this)" class="w-full p-1 border rounded">3 طلاب لديهم رهاب اجتماعي</textarea></td>
-            <td data-stage="middle"><textarea id="guid_p_m" rows="2" oninput="handleInput(this)" class="w-full p-1 border rounded">-</textarea></td>
-            <td data-stage="secondary"><textarea id="guid_p_s" rows="2" oninput="handleInput(this)" class="w-full p-1 border rounded"></textarea></td>
-            <td data-stage="special"><textarea id="guid_p_sp" rows="2" oninput="handleInput(this)" class="w-full p-1 border rounded">-</textarea></td>
-          </tr>
-          <tr>
-            <td class="font-bold bg-slate-50">البرامج الإرشادية المقدمة</td>
-            <td data-stage="primary"><textarea id="guid_prog_p" rows="3" oninput="handleInput(this)" class="w-full p-1 border rounded">جلسات فردية وجماعية مع الموجه الطلابي</textarea></td>
-            <td data-stage="middle"><textarea id="guid_prog_m" rows="3" oninput="handleInput(this)" class="w-full p-1 border rounded">نشرات توعوية "الالتزام بعد الإجازة"&#10;نشرات توعوية "التوعية بالاختبارات المركزية"</textarea></td>
-            <td data-stage="secondary"><textarea id="guid_prog_s" rows="3" oninput="handleInput(this)" class="w-full p-1 border rounded"></textarea></td>
-            <td data-stage="special"><textarea id="guid_prog_sp" rows="3" oninput="handleInput(this)" class="w-full p-1 border rounded">-</textarea></td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="mt-2 bg-slate-50 p-1.5 rounded border" data-stage="admin">
-        <label class="block text-[11px] font-bold text-slate-700 mb-0.5">توصيات المشرف العام وإدارة الإشراف (البرامج الإرشادية ورعاية الحالات):</label>
-        <input type="text" id="admin_action_guidance" value="تكثيف برامج التوجيه الطلابي ومتابعة الحالات الخاصة بصورة دورية ومستمرة" oninput="handleInput(this)" class="w-full text-xs p-1 border rounded">
-      </div>
-    </section>
-
-    <!-- 5. الأنشطة والمكتسبات المهارية -->
-    <section class="mb-6">
-      <h4 class="text-xs md:text-sm font-bold bg-slate-800 text-white px-3 py-1.5 rounded-t-lg">
-        🎯 5. النشاط والموهبة & المكتسبات المهارية
-      </h4>
       <div class="overflow-x-auto">
-        <table class="table-custom text-xs">
+        <table class="table-custom text-xs md:text-sm">
           <thead>
-            <tr>
-              <th class="w-48">البيان</th>
-              <th class="w-1/4">ابتدائي</th>
-              <th class="w-1/4">متوسط</th>
-              <th class="w-1/4">ثانوي</th>
-              <th class="w-1/4">تربية خاصة</th>
-            </tr>
+            <tr><th class="w-44">البيان</th><th>ابتدائي</th><th>متوسط</th><th>ثانوي</th><th>تربية خاصة</th></tr>
           </thead>
           <tbody>
             <tr>
-              <td class="font-bold bg-slate-50">برامج النشاط والموهبة</td>
-              <td data-stage="primary"><textarea id="act_p" rows="3" oninput="handleInput(this)" class="expandable-input"></textarea></td>
-              <td data-stage="middle"><textarea id="act_m" rows="3" oninput="handleInput(this)" class="expandable-input">معايدة الطلاب لعيد الأضحى المبارك.&#10;استقبال طلاب صف سادس الابتدائي بالقسم المتوسط.&#10;زيارة لصف ثالث متوسط لقسم الثانوي.</textarea></td>
-              <td data-stage="secondary"><textarea id="act_s" rows="3" oninput="handleInput(this)" class="expandable-input">استقبال الطلاب والمعايدة&#10;حفل التخرج</textarea></td>
-              <td data-stage="special"><textarea id="act_sp" rows="3" oninput="handleInput(this)" class="expandable-input">-</textarea></td>
+              <td class="font-bold bg-slate-50">الحالات الصحية</td>
+              <td><textarea id="guid_h_p" rows="2" oninput="handleInput(this)" class="expandable-input"></textarea></td>
+              <td><textarea id="guid_h_m" rows="2" oninput="handleInput(this)" class="expandable-input"></textarea></td>
+              <td><textarea id="guid_h_s" rows="2" oninput="handleInput(this)" class="expandable-input"></textarea></td>
+              <td><textarea id="guid_h_sp" rows="2" oninput="handleInput(this)" class="expandable-input"></textarea></td>
             </tr>
             <tr>
-              <td class="font-bold bg-slate-50">المكتسبات المهارية</td>
-              <td data-stage="primary"><textarea id="skill_p" rows="3" oninput="handleInput(this)" class="expandable-input">المهارات الاجتماعية: التعاون واللباقة وحل المشكلات</textarea></td>
-              <td data-stage="middle"><textarea id="skill_m" rows="3" oninput="handleInput(this)" class="expandable-input">الرقابة الذاتية: الالتزام بعد الإجازة&#10;المعرفي: الاختبارات المركزية</textarea></td>
-              <td data-stage="secondary"><textarea id="skill_s" rows="3" oninput="handleInput(this)" class="expandable-input"></textarea></td>
-              <td data-stage="special"><textarea id="skill_sp" rows="3" oninput="handleInput(this)" class="expandable-input">-</textarea></td>
+              <td class="font-bold bg-slate-50">الحالات النفسية</td>
+              <td><textarea id="guid_p_p" rows="2" oninput="handleInput(this)" class="expandable-input"></textarea></td>
+              <td><textarea id="guid_p_m" rows="2" oninput="handleInput(this)" class="expandable-input"></textarea></td>
+              <td><textarea id="guid_p_s" rows="2" oninput="handleInput(this)" class="expandable-input"></textarea></td>
+              <td><textarea id="guid_p_sp" rows="2" oninput="handleInput(this)" class="expandable-input"></textarea></td>
+            </tr>
+            <tr>
+              <td class="font-bold bg-slate-50">البرامج الإرشادية المقدمة</td>
+              <td><textarea id="guid_prog_p" rows="3" oninput="handleInput(this)" class="expandable-input"></textarea></td>
+              <td><textarea id="guid_prog_m" rows="3" oninput="handleInput(this)" class="expandable-input"></textarea></td>
+              <td><textarea id="guid_prog_s" rows="3" oninput="handleInput(this)" class="expandable-input"></textarea></td>
+              <td><textarea id="guid_prog_sp" rows="3" oninput="handleInput(this)" class="expandable-input"></textarea></td>
             </tr>
           </tbody>
         </table>
       </div>
-      <div class="mt-2 bg-slate-50 p-1.5 rounded border" data-stage="admin">
-        <label class="block text-[11px] font-bold text-slate-700 mb-0.5">تقييم وتوصيات الإشراف للبرامج:</label>
-        <input type="text" id="admin_eval_act" value="متابعة تنفيذ البرامج وتقييم أثرها على انضباط الطلاب" oninput="handleInput(this)" class="w-full text-xs p-1 border rounded">
+      <div class="mt-2 bg-slate-50 p-1.5 rounded border">
+        <label class="block text-[11px] font-bold text-slate-700 mb-0.5">توصيات المشرف العام وإدارة الإشراف (البرامج الإرشادية ورعاية الحالات):</label>
+        <input type="text" id="admin_action_guidance" data-owner="admin" oninput="handleInput(this)" class="w-full text-xs p-1 border rounded">
       </div>
     </section>
 
-    <!-- 6. برامج الإدارة المدرسية (تم تغيير مسمى زيارات الوكيل والمشرفين إلى زيارات الوكيل) -->
-    <section class="mb-6">
+    <!-- 5. النشاط والموهبة -->
+    <section class="mb-6 avoid-page-break">
       <h4 class="text-xs md:text-sm font-bold bg-slate-800 text-white px-3 py-1.5 rounded-t-lg">
-        🏫 6. برامج الإدارة المدرسية
+        🎯 5. النشاط والموهبة
       </h4>
       <div class="overflow-x-auto">
         <table class="table-custom text-xs">
           <thead>
             <tr>
-              <th class="w-48">البيان</th>
+              <th class="w-44">البيان</th>
               <th class="w-1/4">ابتدائي</th>
               <th class="w-1/4">متوسط</th>
               <th class="w-1/4">ثانوي</th>
@@ -538,49 +542,124 @@
           </thead>
           <tbody>
             <tr>
-              <td class="font-bold bg-slate-50">تكريم وتحفيز</td>
-              <td data-stage="primary"><textarea id="adm_rew_p" rows="2" oninput="handleInput(this)" class="expandable-input">تكريم المعلمين المتميزين</textarea></td>
-              <td data-stage="middle"><textarea id="adm_rew_m" rows="2" oninput="handleInput(this)" class="expandable-input">-</textarea></td>
-              <td data-stage="secondary"><textarea id="adm_rew_s" rows="2" oninput="handleInput(this)" class="expandable-input"></textarea></td>
-              <td data-stage="special"><textarea id="adm_rew_sp" rows="2" oninput="handleInput(this)" class="expandable-input">-</textarea></td>
+              <td class="font-bold bg-slate-50">برامج النشاط والموهبة المنفذة</td>
+              <td><textarea id="act_p" rows="3" oninput="handleInput(this)" class="expandable-input"></textarea></td>
+              <td><textarea id="act_m" rows="3" oninput="handleInput(this)" class="expandable-input"></textarea></td>
+              <td><textarea id="act_s" rows="3" oninput="handleInput(this)" class="expandable-input"></textarea></td>
+              <td><textarea id="act_sp" rows="3" oninput="handleInput(this)" class="expandable-input"></textarea></td>
+            </tr>
+            <tr class="bg-amber-50/50">
+              <td class="font-bold bg-amber-100 text-amber-950">تقييم وتوصيات المشرف العام للنشاط</td>
+              <td><textarea id="act_eval_p" data-owner="admin" rows="2" placeholder="تقييم الابتدائي..." oninput="handleInput(this)" class="expandable-input bg-white"></textarea></td>
+              <td><textarea id="act_eval_m" data-owner="admin" rows="2" placeholder="تقييم المتوسط..." oninput="handleInput(this)" class="expandable-input bg-white"></textarea></td>
+              <td><textarea id="act_eval_s" data-owner="admin" rows="2" placeholder="تقييم الثانوي..." oninput="handleInput(this)" class="expandable-input bg-white"></textarea></td>
+              <td><textarea id="act_eval_sp" data-owner="admin" rows="2" placeholder="تقييم التربية الخاصة..." oninput="handleInput(this)" class="expandable-input bg-white"></textarea></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 6. المكتسبات المهارية -->
+    <section class="mb-6 avoid-page-break">
+      <h4 class="text-xs md:text-sm font-bold bg-slate-800 text-white px-3 py-1.5 rounded-t-lg">
+        💡 6. المكتسبات المهارية
+      </h4>
+      <div class="overflow-x-auto">
+        <table class="table-custom text-xs">
+          <thead>
+            <tr>
+              <th class="w-44">البيان</th>
+              <th class="w-1/4">ابتدائي</th>
+              <th class="w-1/4">متوسط</th>
+              <th class="w-1/4">ثانوي</th>
+              <th class="w-1/4">تربية خاصة</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="font-bold bg-slate-50">المكتسبات المهارية المتحققة</td>
+              <td><textarea id="skill_p" rows="3" oninput="handleInput(this)" class="expandable-input"></textarea></td>
+              <td><textarea id="skill_m" rows="3" oninput="handleInput(this)" class="expandable-input"></textarea></td>
+              <td><textarea id="skill_s" rows="3" oninput="handleInput(this)" class="expandable-input"></textarea></td>
+              <td><textarea id="skill_sp" rows="3" oninput="handleInput(this)" class="expandable-input"></textarea></td>
+            </tr>
+            <tr class="bg-amber-50/50">
+              <td class="font-bold bg-amber-100 text-amber-950">تقييم وتوصيات المشرف العام للمهارات</td>
+              <td><textarea id="skill_eval_p" data-owner="admin" rows="2" placeholder="تقييم مهارات الابتدائي..." oninput="handleInput(this)" class="expandable-input bg-white"></textarea></td>
+              <td><textarea id="skill_eval_m" data-owner="admin" rows="2" placeholder="تقييم مهارات المتوسط..." oninput="handleInput(this)" class="expandable-input bg-white"></textarea></td>
+              <td><textarea id="skill_eval_s" data-owner="admin" rows="2" placeholder="تقييم مهارات الثانوي..." oninput="handleInput(this)" class="expandable-input bg-white"></textarea></td>
+              <td><textarea id="skill_eval_sp" data-owner="admin" rows="2" placeholder="تقييم مهارات التربية الخاصة..." oninput="handleInput(this)" class="expandable-input bg-white"></textarea></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 7. البرامج المقدمة من قبل مدير المدرسة والوكيل -->
+    <section class="mb-6 avoid-page-break">
+      <h4 class="text-xs md:text-sm font-bold bg-slate-800 text-white px-3 py-1.5 rounded-t-lg">
+        🏫 7. البرامج المقدمة من قبل مدير المدرسة والوكيل
+      </h4>
+      <div class="overflow-x-auto">
+        <table class="table-custom text-xs">
+          <thead>
+            <tr>
+              <th class="w-44">البيان</th>
+              <th class="w-1/4">ابتدائي</th>
+              <th class="w-1/4">متوسط</th>
+              <th class="w-1/4">ثانوي</th>
+              <th class="w-1/4">تربية خاصة</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="font-bold bg-slate-50">تكريم وتحفيز الموظفين</td>
+              <td><textarea id="adm_rew_p" rows="2" oninput="handleInput(this)" class="expandable-input"></textarea></td>
+              <td><textarea id="adm_rew_m" rows="2" oninput="handleInput(this)" class="expandable-input"></textarea></td>
+              <td><textarea id="adm_rew_s" rows="2" oninput="handleInput(this)" class="expandable-input"></textarea></td>
+              <td><textarea id="adm_rew_sp" rows="2" oninput="handleInput(this)" class="expandable-input"></textarea></td>
             </tr>
             <tr>
               <td class="font-bold bg-slate-50">النمو المهني</td>
-              <td data-stage="primary"><textarea id="adm_dev_p" rows="2" oninput="handleInput(this)" class="expandable-input text-center">0</textarea></td>
-              <td data-stage="middle"><textarea id="adm_dev_m" rows="2" oninput="handleInput(this)" class="expandable-input text-center">2 لقاء فردي + 1 اجتماع</textarea></td>
-              <td data-stage="secondary"><textarea id="adm_dev_s" rows="2" oninput="handleInput(this)" class="expandable-input text-center"></textarea></td>
-              <td data-stage="special"><textarea id="adm_dev_sp" rows="2" oninput="handleInput(this)" class="expandable-input text-center">-</textarea></td>
+              <td><textarea id="adm_dev_p" rows="2" oninput="handleInput(this)" class="expandable-input text-center"></textarea></td>
+              <td><textarea id="adm_dev_m" rows="2" oninput="handleInput(this)" class="expandable-input text-center"></textarea></td>
+              <td><textarea id="adm_dev_s" rows="2" oninput="handleInput(this)" class="expandable-input text-center"></textarea></td>
+              <td><textarea id="adm_dev_sp" rows="2" oninput="handleInput(this)" class="expandable-input text-center"></textarea></td>
             </tr>
             <tr>
               <td class="font-bold bg-slate-50">زيارات المدير الصفية</td>
-              <td data-stage="primary"><textarea id="adm_vis_dir_p" rows="2" oninput="handleInput(this)" class="expandable-input text-center">0</textarea></td>
-              <td data-stage="middle"><textarea id="adm_vis_dir_m" rows="2" oninput="handleInput(this)" class="expandable-input text-center">0</textarea></td>
-              <td data-stage="secondary"><textarea id="adm_vis_dir_s" rows="2" oninput="handleInput(this)" class="expandable-input text-center"></textarea></td>
-              <td data-stage="special"><textarea id="adm_vis_dir_sp" rows="2" oninput="handleInput(this)" class="expandable-input text-center">-</textarea></td>
+              <td><textarea id="adm_vis_dir_p" rows="2" oninput="handleInput(this)" class="expandable-input text-center"></textarea></td>
+              <td><textarea id="adm_vis_dir_m" rows="2" oninput="handleInput(this)" class="expandable-input text-center"></textarea></td>
+              <td><textarea id="adm_vis_dir_s" rows="2" oninput="handleInput(this)" class="expandable-input text-center"></textarea></td>
+              <td><textarea id="adm_vis_dir_sp" rows="2" oninput="handleInput(this)" class="expandable-input text-center"></textarea></td>
             </tr>
             <tr>
               <td class="font-bold bg-slate-50">زيارات الوكيل</td>
-              <td data-stage="primary"><textarea id="adm_vis_v_p" rows="2" oninput="handleInput(this)" class="expandable-input text-center">0</textarea></td>
-              <td data-stage="middle"><textarea id="adm_vis_v_m" rows="2" oninput="handleInput(this)" class="expandable-input text-center">0</textarea></td>
-              <td data-stage="secondary"><textarea id="adm_vis_v_s" rows="2" oninput="handleInput(this)" class="expandable-input text-center"></textarea></td>
-              <td data-stage="special"><textarea id="adm_vis_v_sp" rows="2" oninput="handleInput(this)" class="expandable-input text-center">الوكيل 0</textarea></td>
+              <td><textarea id="adm_vis_v_p" rows="2" oninput="handleInput(this)" class="expandable-input text-center"></textarea></td>
+              <td><textarea id="adm_vis_v_m" rows="2" oninput="handleInput(this)" class="expandable-input text-center"></textarea></td>
+              <td><textarea id="adm_vis_v_s" rows="2" oninput="handleInput(this)" class="expandable-input text-center"></textarea></td>
+              <td><textarea id="adm_vis_v_sp" rows="2" oninput="handleInput(this)" class="expandable-input text-center"></textarea></td>
+            </tr>
+            <tr class="bg-amber-50/50">
+              <td class="font-bold bg-amber-100 text-amber-950">تقييم المشرف العام لبرامج الإدارة</td>
+              <td><textarea id="adm_eval_p" data-owner="admin" rows="2" placeholder="تقييم الإدارة للابتدائي..." oninput="handleInput(this)" class="expandable-input bg-white"></textarea></td>
+              <td><textarea id="adm_eval_m" data-owner="admin" rows="2" placeholder="تقييم الإدارة للمتوسط..." oninput="handleInput(this)" class="expandable-input bg-white"></textarea></td>
+              <td><textarea id="adm_eval_s" data-owner="admin" rows="2" placeholder="تقييم الإدارة للثانوي..." oninput="handleInput(this)" class="expandable-input bg-white"></textarea></td>
+              <td><textarea id="adm_eval_sp" data-owner="admin" rows="2" placeholder="تقييم الإدارة للتربية الخاصة..." oninput="handleInput(this)" class="expandable-input bg-white"></textarea></td>
             </tr>
           </tbody>
         </table>
       </div>
-      <div class="mt-2 bg-slate-50 p-1.5 rounded border" data-stage="admin">
-        <label class="block text-[11px] font-bold text-slate-700 mb-0.5">توصيات إدارة الإشراف التربوي:</label>
-        <input type="text" id="admin_action_admin_prog" value="متابعة الزيارات الصفية والانتظام اليومي للمعلمين" oninput="handleInput(this)" class="w-full text-xs p-1 border rounded">
-      </div>
     </section>
 
-    <!-- 7. أعمال الصيانة المرفوعة ومتابعة الإنجاز -->
-    <section class="mb-4 border-2 border-slate-700 rounded-xl overflow-hidden shadow-sm">
+    <!-- 8. أعمال الصيانة المرفوعة ومتابعة الإنجاز -->
+    <section class="mb-4 border-2 border-slate-700 rounded-xl overflow-hidden shadow-sm avoid-page-break">
       <div class="bg-slate-800 text-white px-3 py-2 flex justify-between items-center">
         <h4 class="text-xs md:text-sm font-bold flex items-center gap-1.5">
-          <span>🛠️</span> 7. أعمال الصيانة المرفوعة ومتابعة الإنجاز
+          <span>🛠️</span> 8. أعمال الصيانة المرفوعة ومتابعة الإنجاز
         </h4>
-        <span class="text-[10px] bg-amber-500 text-slate-950 font-bold px-2 py-0.5 rounded">متابعة مشتركة بين المراحل وقسم الصيانة</span>
+        <span class="text-[10px] bg-amber-500 text-slate-950 font-bold px-2 py-0.5 rounded">متابعة بلاغات الصيانة بالمراحل</span>
       </div>
       
       <div class="overflow-x-auto p-2 bg-slate-50">
@@ -598,100 +677,60 @@
             <tr>
               <td class="font-bold bg-slate-100 text-slate-800">
                 أعمال الصيانة المرفوعة
-                <span class="block text-[9px] text-slate-500 font-normal mt-0.5">(تعبئة مدير المرحلة)</span>
               </td>
-              <td data-stage="primary">
+              <td>
                 <textarea id="maint_work_primary" rows="2" oninput="handleInput(this)" placeholder="سجل بلاغات صيانة الابتدائي..." class="expandable-input mb-1.5"></textarea>
-                <div class="flex items-center justify-between gap-1">
+                <div class="flex items-center justify-between gap-1 no-print">
                   <button type="button" onclick="setMaintStageStatus('primary', 'done')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold py-1 px-1.5 rounded flex-1">🟢 نُفّذ</button>
                   <button type="button" onclick="setMaintStageStatus('primary', 'undone')" class="bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-bold py-1 px-1.5 rounded flex-1">🔴 لم يُنفّذ</button>
                 </div>
                 <div id="maint_badge_primary" class="mt-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-200 text-slate-700">قيد المتابعة</div>
               </td>
-              <td data-stage="middle">
+              <td>
                 <textarea id="maint_work_middle" rows="2" oninput="handleInput(this)" placeholder="سجل بلاغات صيانة المتوسط..." class="expandable-input mb-1.5"></textarea>
-                <div class="flex items-center justify-between gap-1">
+                <div class="flex items-center justify-between gap-1 no-print">
                   <button type="button" onclick="setMaintStageStatus('middle', 'done')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold py-1 px-1.5 rounded flex-1">🟢 نُفّذ</button>
                   <button type="button" onclick="setMaintStageStatus('middle', 'undone')" class="bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-bold py-1 px-1.5 rounded flex-1">🔴 لم يُنفّذ</button>
                 </div>
                 <div id="maint_badge_middle" class="mt-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-200 text-slate-700">قيد المتابعة</div>
               </td>
-              <td data-stage="secondary">
+              <td>
                 <textarea id="maint_work_secondary" rows="2" oninput="handleInput(this)" placeholder="سجل بلاغات صيانة الثانوي..." class="expandable-input mb-1.5"></textarea>
-                <div class="flex items-center justify-between gap-1">
+                <div class="flex items-center justify-between gap-1 no-print">
                   <button type="button" onclick="setMaintStageStatus('secondary', 'done')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold py-1 px-1.5 rounded flex-1">🟢 نُفّذ</button>
                   <button type="button" onclick="setMaintStageStatus('secondary', 'undone')" class="bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-bold py-1 px-1.5 rounded flex-1">🔴 لم يُنفّذ</button>
                 </div>
                 <div id="maint_badge_secondary" class="mt-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-200 text-slate-700">قيد المتابعة</div>
               </td>
-              <td data-stage="special">
+              <td>
                 <textarea id="maint_work_special" rows="2" oninput="handleInput(this)" placeholder="سجل بلاغات صيانة التربية الخاصة..." class="expandable-input mb-1.5"></textarea>
-                <div class="flex items-center justify-between gap-1">
+                <div class="flex items-center justify-between gap-1 no-print">
                   <button type="button" onclick="setMaintStageStatus('special', 'done')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold py-1 px-1.5 rounded flex-1">🟢 نُفّذ</button>
                   <button type="button" onclick="setMaintStageStatus('special', 'undone')" class="bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-bold py-1 px-1.5 rounded flex-1">🔴 لم يُنفّذ</button>
                 </div>
                 <div id="maint_badge_special" class="mt-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-200 text-slate-700">قيد المتابعة</div>
               </td>
             </tr>
-
-            <tr class="bg-amber-50/50">
-              <td class="font-bold bg-amber-100/70 text-amber-950">
-                مرئيات ورأي قسم الصيانة
-                <span class="block text-[9px] text-amber-700 font-normal mt-0.5">(تعبئة مسؤول الصيانة)</span>
-              </td>
-              <td data-stage="maintenance">
-                <textarea id="maint_feedback_primary" rows="2" oninput="handleInput(this)" placeholder="رأي وإجراء قسم الصيانة للابتدائي..." class="expandable-input mb-1.5 bg-white"></textarea>
-                <div class="flex items-center justify-between gap-1">
-                  <button type="button" onclick="setMaintTeamStatus('primary', 'done')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold py-1 px-1.5 rounded flex-1">🟢 نُفّذ</button>
-                  <button type="button" onclick="setMaintTeamStatus('primary', 'undone')" class="bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-bold py-1 px-1.5 rounded flex-1">🔴 لم يُنفّذ</button>
-                </div>
-                <div id="maint_team_badge_primary" class="mt-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-200 text-slate-700">بانتظار رد الصيانة</div>
-              </td>
-              <td data-stage="maintenance">
-                <textarea id="maint_feedback_middle" rows="2" oninput="handleInput(this)" placeholder="رأي وإجراء قسم الصيانة للمتوسط..." class="expandable-input mb-1.5 bg-white"></textarea>
-                <div class="flex items-center justify-between gap-1">
-                  <button type="button" onclick="setMaintTeamStatus('middle', 'done')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold py-1 px-1.5 rounded flex-1">🟢 نُفّذ</button>
-                  <button type="button" onclick="setMaintTeamStatus('middle', 'undone')" class="bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-bold py-1 px-1.5 rounded flex-1">🔴 لم يُنفّذ</button>
-                </div>
-                <div id="maint_team_badge_middle" class="mt-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-200 text-slate-700">بانتظار رد الصيانة</div>
-              </td>
-              <td data-stage="maintenance">
-                <textarea id="maint_feedback_secondary" rows="2" oninput="handleInput(this)" placeholder="رأي وإجراء قسم الصيانة للثانوي..." class="expandable-input mb-1.5 bg-white"></textarea>
-                <div class="flex items-center justify-between gap-1">
-                  <button type="button" onclick="setMaintTeamStatus('secondary', 'done')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold py-1 px-1.5 rounded flex-1">🟢 نُفّذ</button>
-                  <button type="button" onclick="setMaintTeamStatus('secondary', 'undone')" class="bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-bold py-1 px-1.5 rounded flex-1">🔴 لم يُنفّذ</button>
-                </div>
-                <div id="maint_team_badge_secondary" class="mt-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-200 text-slate-700">بانتظار رد الصيانة</div>
-              </td>
-              <td data-stage="maintenance">
-                <textarea id="maint_feedback_special" rows="2" oninput="handleInput(this)" placeholder="رأي وإجراء قسم الصيانة للتربية الخاصة..." class="expandable-input mb-1.5 bg-white"></textarea>
-                <div class="flex items-center justify-between gap-1">
-                  <button type="button" onclick="setMaintTeamStatus('special', 'done')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold py-1 px-1.5 rounded flex-1">🟢 نُفّذ</button>
-                  <button type="button" onclick="setMaintTeamStatus('special', 'undone')" class="bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-bold py-1 px-1.5 rounded flex-1">🔴 لم يُنفّذ</button>
-                </div>
-                <div id="maint_team_badge_special" class="mt-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-200 text-slate-700">بانتظار رد الصيانة</div>
-              </td>
-            </tr>
           </tbody>
         </table>
         
-        <div class="mt-2 bg-white p-2 rounded border" data-stage="admin">
+        <div class="mt-2 bg-white p-2 rounded border">
           <label class="block text-xs font-bold text-slate-700 mb-1">توصيات المشرف العام وإدارة الإشراف حول أعمال الصيانة:</label>
-          <input type="text" id="admin_action_maint" value="لا يوجد وتم متابعة اغلاق الشبابيك في القسم الثانوي مع ابي راكان" oninput="handleInput(this)" class="w-full text-xs p-1 border rounded">
+          <input type="text" id="admin_action_maint" data-owner="admin" oninput="handleInput(this)" class="w-full text-xs p-1 border rounded">
         </div>
       </div>
     </section>
 
-    <!-- شواهد ومرفقات أعمال الصيانة للأقسام (رفع صور متعددة) -->
-    <section class="mb-6 border border-slate-300 rounded-xl p-4 bg-slate-50">
+    <!-- شواهد ومرفقات أعمال الصيانة -->
+    <section class="mb-6 border border-slate-300 rounded-xl p-4 bg-slate-50 avoid-page-break">
       <div class="flex flex-wrap justify-between items-center mb-3">
         <div>
           <h4 class="text-xs md:text-sm font-bold text-slate-800 flex items-center gap-2">
             <span>📷</span> شواهد ومرفقات أعمال الصيانة للأقسام (رفع صور متعددة)
           </h4>
-          <p class="text-[10px] text-slate-500 mt-0.5">يمكن لمدراء الأقسام ومسؤول الصيانة رفع صور البلاغات قبل وبعد الإصلاح</p>
+          <p class="text-[10px] text-slate-500 mt-0.5">يمكن لفريق الإشراف رفع صور البلاغات قبل وبعد الإصلاح</p>
         </div>
-        <label class="cursor-pointer bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-1.5 rounded text-xs transition shadow flex items-center gap-1">
+        <label class="cursor-pointer bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-1.5 rounded text-xs transition shadow flex items-center gap-1 no-print">
           <span>📤</span> إضافة صور شواهد
           <input type="file" id="maintPhotosInput" accept="image/*" multiple onchange="uploadMultipleMaintImages(event)" class="hidden">
         </label>
@@ -703,94 +742,148 @@
       </div>
     </section>
 
-    <!-- 8. الأساليب الإشرافية المنفذة -->
-    <section class="mb-6">
-      <div class="bg-slate-800 text-white px-3 py-1.5 rounded-t-lg flex justify-between items-center">
-        <h4 class="text-xs md:text-sm font-bold">📋 8. الأساليب الإشرافية المنفذة (تسجيل الأعداد)</h4>
-        <span id="supervisionTag" class="text-[10px] bg-amber-500 text-slate-950 font-bold px-2 py-0.5 rounded">خاص بفريق الإشراف والمشرف العام</span>
-      </div>
+    <!-- ========================================================================= -->
+    <!-- الحاوية المدمجة: تبدأ في صفحة طباعة جديدة وتضم الأساليب والجداول الختامية والتوقيعات معاً -->
+    <!-- ========================================================================= -->
+    <div class="print-section-page">
 
-      <div class="overflow-x-auto">
-        <table class="table-custom text-[11px]" id="supervisionTable">
-          <thead>
-            <tr>
-              <th rowspan="2" class="w-14">اليوم</th>
-              <th colspan="21">الأساليب الإشرافية</th>
-              <th colspan="3" class="bg-amber-100 text-amber-950">المستفيدون</th>
-            </tr>
-            <tr class="text-[10px]">
-              <th>اجتماع</th><th>زيارة صفية</th><th>لقاء فردي</th><th>درس تطبيقي</th><th>تبادل زيارة</th>
-              <th>مداولة</th><th>قراءة موجهة</th><th>روابط تفاعلية</th><th>ورش عمل</th><th>تدريب مصغر</th>
-              <th>مقابلات معلمين</th><th>أعمال كتابية</th><th>المنصة</th><th>تقويمات</th><th>متابعة برامج</th>
-              <th>تحكيم اختبارات</th><th>جودة</th><th>خطط إداريين</th><th>جولات</th><th>تكريم</th><th>دورة تدريبية</th>
-              <th class="bg-amber-50 text-amber-900 font-bold">طالب</th>
-              <th class="bg-amber-50 text-amber-900 font-bold">معلم</th>
-              <th class="bg-amber-50 text-amber-900 font-bold">إداري</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr data-day="sun"><td class="font-bold bg-slate-50">الأحد</td><td><input type="number" id="sup_0_0" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_1" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_2" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_3" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_4" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_5" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_6" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_7" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_8" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_9" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_10" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_11" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_12" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_13" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_14" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_15" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_16" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_17" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_18" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_19" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_20" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td class="bg-amber-50"><input type="number" id="sup_0_21" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td class="bg-amber-50"><input type="number" id="sup_0_22" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td class="bg-amber-50"><input type="number" id="sup_0_23" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td></tr>
-            <tr data-day="mon"><td class="font-bold bg-slate-50">الإثنين</td><td><input type="number" id="sup_1_0" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_1" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_2" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_3" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_4" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_5" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_6" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_7" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_8" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_9" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_10" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_11" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_12" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_13" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_14" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_15" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_16" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_17" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_18" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_19" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_20" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td class="bg-amber-50"><input type="number" id="sup_1_21" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td class="bg-amber-50"><input type="number" id="sup_1_22" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td class="bg-amber-50"><input type="number" id="sup_1_23" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td></tr>
-            <tr data-day="tue"><td class="font-bold bg-slate-50">الثلاثاء</td><td><input type="number" id="sup_2_0" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_1" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_2" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_3" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_4" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_5" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_6" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_7" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_8" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_9" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_10" value="4" class="w-7 text-center sup-cell font-bold text-blue-700" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_11" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_12" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_13" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_14" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_15" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_16" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_17" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_18" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_19" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_20" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td class="bg-amber-50"><input type="number" id="sup_2_21" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td class="bg-amber-50"><input type="number" id="sup_2_22" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td class="bg-amber-50"><input type="number" id="sup_2_23" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td></tr>
-            <tr data-day="wed"><td class="font-bold bg-slate-50">الأربعاء</td><td><input type="number" id="sup_3_0" value="3" class="w-7 text-center sup-cell font-bold text-blue-700" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_1" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_2" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_3" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_4" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_5" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_6" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_7" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_8" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_9" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_10" value="3" class="w-7 text-center sup-cell font-bold text-blue-700" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_11" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_12" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_13" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_14" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_15" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_16" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_17" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_18" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_19" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_20" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td class="bg-amber-50"><input type="number" id="sup_3_21" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td class="bg-amber-50"><input type="number" id="sup_3_22" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td class="bg-amber-50"><input type="number" id="sup_3_23" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td></tr>
-            <tr data-day="thu"><td class="font-bold bg-slate-50">الخميس</td><td><input type="number" id="sup_4_0" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_1" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_2" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_3" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_4" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_5" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_6" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_7" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_8" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_9" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_10" value="4" class="w-7 text-center sup-cell font-bold text-blue-700" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_11" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_12" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_13" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_14" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_15" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_16" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_17" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_18" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_19" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_20" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td class="bg-amber-50"><input type="number" id="sup_4_21" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td class="bg-amber-50"><input type="number" id="sup_4_22" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td class="bg-amber-50"><input type="number" id="sup_4_23" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td></tr>
-            <tr id="totalRow" class="bg-slate-200 font-extrabold text-slate-900">
-              <td>المجموع</td>
-              <td id="tot_0">0</td><td id="tot_1">0</td><td id="tot_2">0</td><td id="tot_3">0</td><td id="tot_4">0</td>
-              <td id="tot_5">0</td><td id="tot_6">0</td><td id="tot_7">0</td><td id="tot_8">0</td><td id="tot_9">0</td>
-              <td id="tot_10">0</td><td id="tot_11">0</td><td id="tot_12">0</td><td id="tot_13">0</td><td id="tot_14">0</td>
-              <td id="tot_15">0</td><td id="tot_16">0</td><td id="tot_17">0</td><td id="tot_18">0</td><td id="tot_19">0</td>
-              <td id="tot_20">0</td>
-              <td id="tot_stu" class="bg-amber-100">0</td>
-              <td id="tot_tea" class="bg-amber-100">0</td>
-              <td id="tot_adm" class="bg-amber-100">0</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
+      <!-- 9. الأساليب الإشرافية لفريق الإشراف -->
+      <section class="mb-4 compact-print-space avoid-page-break">
+        <div class="bg-slate-800 text-white px-3 py-1 rounded-t-lg flex justify-between items-center">
+          <h4 class="text-xs md:text-sm font-bold">📋 9. الأساليب الإشرافية لفريق الإشراف (تسجيل الأعداد)</h4>
+          <span id="supervisionTag" class="text-[10px] bg-amber-500 text-slate-950 font-bold px-2 py-0.5 rounded no-print">خاص بفريق الإشراف والمشرف العام</span>
+        </div>
 
-    <!-- 9. خلاصة الأعمال الإشرافية العامة -->
-    <section class="mb-6" data-stage="admin">
-      <h4 class="text-xs md:text-sm font-bold bg-slate-800 text-white px-3 py-1.5 rounded-t-lg">
-        📝 9. خلاصة الأعمال الإشرافية العامة عن الأقسام
-      </h4>
-      <textarea id="admin_general_summary" rows="5" oninput="handleInput(this)" class="w-full p-2 border rounded-b text-xs md:text-sm leading-relaxed">* زيارات ميدانية لمتابعة التحصيل وختام الأنشطة والتأكيد على الاستعداد لزيارة متوسطة سمرقند والاجتماع بمديرها مع الوكيل وإعداد المسرح وتجهيزه والاستفادة من ذلك للتسويق للمدارس.
-* تم عمل عدد من المقابلات وتم الإعداد لخطة النشاط للعام القادم وإعداد الخطة التشغيلية للإشراف والخطة لكل مشرف مع البرامج التدريبية حيث تعرض الأحد القادم لتتم مناقشتها.
-* تم الاتفاق على النظر في معلمي اللغة الإنجليزية المتميزين وإمكانية ترشحهم للإشراف التربوي.
-* تم متابعة مشرفة التعليم الأهلي حول اختبارات مادة اللغة الإنجليزية ولكن لم يتم الرد حتى هذه اللحظة وستتم متابعتها يوم الأحد القادم.</textarea>
-    </section>
+        <div class="overflow-x-auto">
+          <table class="table-custom text-[11px]" id="supervisionTable">
+            <thead>
+              <tr>
+                <th rowspan="2" class="w-14">اليوم</th>
+                <th colspan="21">الأساليب الإشرافية</th>
+                <th colspan="3" class="bg-amber-100 text-amber-950">المستفيدون</th>
+              </tr>
+              <tr class="text-[9px]">
+                <th>اجتماع</th><th>زيارة صفية</th><th>لقاء فردي</th><th>درس تطبيقي</th><th>تبادل زيارة</th>
+                <th>مداولة</th><th>قراءة موجهة</th><th>روابط تفاعلية</th><th>ورش عمل</th><th>تدريب مصغر</th>
+                <th>مقابلات معلمين</th><th>أعمال كتابية</th><th>المنصة</th><th>تقويمات</th><th>متابعة برامج</th>
+                <th>تحكيم اختبارات</th><th>جودة</th><th>خطط إداريين</th><th>جولات</th><th>تكريم</th><th>دورة تدريبية</th>
+                <th class="bg-amber-50 text-amber-900 font-bold">طالب</th>
+                <th class="bg-amber-50 text-amber-900 font-bold">معلم</th>
+                <th class="bg-amber-50 text-amber-900 font-bold">إداري</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr data-day="sun"><td class="font-bold bg-slate-50">الأحد</td><td><input type="number" id="sup_0_0" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_1" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_2" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_3" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_4" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_5" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_6" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_7" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_8" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_9" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_10" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_11" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_12" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_13" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_14" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_15" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_16" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_17" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_18" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_19" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_0_20" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td class="bg-amber-50"><input type="number" id="sup_0_21" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td class="bg-amber-50"><input type="number" id="sup_0_22" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td class="bg-amber-50"><input type="number" id="sup_0_23" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td></tr>
+              <tr data-day="mon"><td class="font-bold bg-slate-50">الإثنين</td><td><input type="number" id="sup_1_0" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_1" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_2" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_3" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_4" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_5" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_6" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_7" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_8" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_9" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_10" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_11" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_12" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_13" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_14" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_15" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_16" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_17" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_18" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_19" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_1_20" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td class="bg-amber-50"><input type="number" id="sup_1_21" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td class="bg-amber-50"><input type="number" id="sup_1_22" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td class="bg-amber-50"><input type="number" id="sup_1_23" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td></tr>
+              <tr data-day="tue"><td class="font-bold bg-slate-50">الثلاثاء</td><td><input type="number" id="sup_2_0" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_1" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_2" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_3" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_4" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_5" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_6" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_7" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_8" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_9" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_10" value="4" class="w-7 text-center sup-cell font-bold text-blue-700" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_11" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_12" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_13" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_14" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_15" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_16" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_17" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_18" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_19" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_2_20" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td class="bg-amber-50"><input type="number" id="sup_2_21" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td class="bg-amber-50"><input type="number" id="sup_2_22" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td class="bg-amber-50"><input type="number" id="sup_2_23" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td></tr>
+              <tr data-day="wed"><td class="font-bold bg-slate-50">الأربعاء</td><td><input type="number" id="sup_3_0" value="3" class="w-7 text-center sup-cell font-bold text-blue-700" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_1" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_2" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_3" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_4" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_5" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_6" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_7" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_8" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_9" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_10" value="3" class="w-7 text-center sup-cell font-bold text-blue-700" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_11" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_12" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_13" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_14" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_15" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_16" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_17" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_18" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_19" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_3_20" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td class="bg-amber-50"><input type="number" id="sup_3_21" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td class="bg-amber-50"><input type="number" id="sup_3_22" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td class="bg-amber-50"><input type="number" id="sup_3_23" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td></tr>
+              <tr data-day="thu"><td class="font-bold bg-slate-50">الخميس</td><td><input type="number" id="sup_4_0" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_1" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_2" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_3" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_4" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_5" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_6" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_7" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_8" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_9" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_10" value="4" class="w-7 text-center sup-cell font-bold text-blue-700" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_11" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_12" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_13" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_14" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_15" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_16" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_17" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_18" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_19" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td><input type="number" id="sup_4_20" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td class="bg-amber-50"><input type="number" id="sup_0_21" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td class="bg-amber-50"><input type="number" id="sup_0_22" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td><td class="bg-amber-50"><input type="number" id="sup_0_23" class="w-7 text-center sup-cell" oninput="handleSupInput(this)"></td></tr>
+              <tr id="totalRow" class="bg-slate-200 font-extrabold text-slate-900">
+                <td>المجموع</td>
+                <td id="tot_0">0</td><td id="tot_1">0</td><td id="tot_2">0</td><td id="tot_3">0</td><td id="tot_4">0</td>
+                <td id="tot_5">0</td><td id="tot_6">0</td><td id="tot_7">0</td><td id="tot_8">0</td><td id="tot_9">0</td>
+                <td id="tot_10">0</td><td id="tot_11">0</td><td id="tot_12">0</td><td id="tot_13">0</td><td id="tot_14">0</td>
+                <td id="tot_15">0</td><td id="tot_16">0</td><td id="tot_17">0</td><td id="tot_18">0</td><td id="tot_19">0</td>
+                <td id="tot_20">0</td>
+                <td id="tot_stu" class="bg-amber-100">0</td>
+                <td id="tot_tea" class="bg-amber-100">0</td>
+                <td id="tot_adm" class="bg-amber-100">0</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-    <!-- 10. اعتماد وتوصيات الرئيس التنفيذي -->
-    <section class="mb-6 border-2 border-amber-500 rounded-xl p-4 bg-amber-50/40">
-      <div class="flex flex-wrap justify-between items-center mb-3">
-        <h4 class="text-sm font-black text-slate-900 flex items-center gap-2">
-          <span>📌</span> اعتماد وتوصيات الرئيس التنفيذي
-        </h4>
-      </div>
-      <div>
-        <label class="block text-xs font-bold text-slate-700 mb-1">توصيات وملاحظات الرئيس التنفيذي:</label>
-        <textarea id="ceo_feedback" rows="3" data-stage="ceo" oninput="handleInput(this)" placeholder="يكتب الرئيس التنفيذي توصياته واعتماده النهائي هنا..." class="w-full text-xs md:text-sm p-2.5 border border-amber-300 rounded-lg bg-white focus:ring-2 focus:ring-amber-500"></textarea>
-      </div>
-    </section>
+      <!-- الجدول الأول: خلاصة النظرة الإشرافية العامة عن الأقسام -->
+      <section class="mb-4 compact-print-space avoid-page-break">
+        <h3 class="text-xs md:text-sm font-bold text-lime-900 mb-1.5 flex items-center gap-1.5">
+          <span>📋</span> خلاصة النظرة الإشرافية العامة عن الأقسام:
+          <span class="text-[9px] bg-amber-500 text-slate-950 font-bold px-1.5 py-0.5 rounded no-print">خاصة بالمشرف العام</span>
+        </h3>
+        <div class="overflow-x-auto">
+          <table class="table-official text-xs">
+            <thead>
+              <tr>
+                <th class="w-1/3">إيجابيات عامة</th>
+                <th class="w-1/3">ملاحظات عامة</th>
+                <th class="w-1/3">التوصيات والإجراءات الإشرافية التي تمت</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><textarea id="final_positives_1" data-owner="admin" rows="2" placeholder="سجل الإيجابيات العامة..." oninput="handleInput(this)" class="expandable-input border-0 bg-transparent"></textarea></td>
+                <td><textarea id="final_notes_1" data-owner="admin" rows="2" placeholder="سجل الملاحظات العامة..." oninput="handleInput(this)" class="expandable-input border-0 bg-transparent"></textarea></td>
+                <td><textarea id="final_actions_1" data-owner="admin" rows="2" placeholder="سجل التوصيات والإجراءات..." oninput="handleInput(this)" class="expandable-input border-0 bg-transparent"></textarea></td>
+              </tr>
+              <tr>
+                <td><textarea id="final_positives_2" data-owner="admin" rows="2" placeholder="..." oninput="handleInput(this)" class="expandable-input border-0 bg-transparent"></textarea></td>
+                <td><textarea id="final_notes_2" data-owner="admin" rows="2" placeholder="..." oninput="handleInput(this)" class="expandable-input border-0 bg-transparent"></textarea></td>
+                <td><textarea id="final_actions_2" data-owner="admin" rows="2" placeholder="..." oninput="handleInput(this)" class="expandable-input border-0 bg-transparent"></textarea></td>
+              </tr>
+              <tr>
+                <td><textarea id="final_positives_3" data-owner="admin" rows="2" placeholder="..." oninput="handleInput(this)" class="expandable-input border-0 bg-transparent"></textarea></td>
+                <td><textarea id="final_notes_3" data-owner="admin" rows="2" placeholder="..." oninput="handleInput(this)" class="expandable-input border-0 bg-transparent"></textarea></td>
+                <td><textarea id="final_actions_3" data-owner="admin" rows="2" placeholder="..." oninput="handleInput(this)" class="expandable-input border-0 bg-transparent"></textarea></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-    <!-- التوقيعات الرسمية المعتمدة -->
-    <div class="mt-8 flex justify-between items-center px-4 md:px-8 text-center">
-      <div>
-        <span class="block text-xs text-slate-500 font-semibold mb-1">الختم الرسمي</span>
-        <div class="w-20 h-14 border-2 border-dashed border-slate-300 rounded mx-auto flex items-center justify-center text-[10px] text-slate-400">ختم الإدارة</div>
-      </div>
-      <div>
-        <span class="block text-xs text-slate-500 font-semibold mb-1">المشرف العام على أقسام البنين</span>
-        <span class="text-sm md:text-base font-bold text-slate-900 border-b-2 border-slate-800 pb-1 px-4 inline-block">م . صالح بن خليفه الحربي</span>
-      </div>
-      <div>
-        <span class="block text-xs text-slate-500 font-semibold mb-1">الرئيس التنفيذي للمدارس</span>
-        <span class="text-sm md:text-base font-bold text-slate-900 border-b-2 border-slate-800 pb-1 px-4 inline-block">أ . سعد بن مفرح الغامدي</span>
+      <!-- الجدول الثاني: التوصيات والإجراءات الإشرافية الموجهة للإدارة العامة -->
+      <section class="mb-4 compact-print-space avoid-page-break">
+        <div class="overflow-x-auto">
+          <table class="table-official text-xs">
+            <thead>
+              <tr>
+                <th>التوصيات والإجراءات الإشرافية الموجهة للإدارة العامة <span class="text-[9px] font-normal no-print">(خاصة بالمشرف العام)</span></th>
+                <th class="w-28 bg-[#d9e2b3] text-[#1a2e05] text-center font-bold">القسم</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><textarea id="dir_action_primary" data-owner="admin" rows="2" placeholder="توصيات وإجراءات القسم الابتدائي..." oninput="handleInput(this)" class="expandable-input border-0 bg-transparent"></textarea></td>
+                <td class="font-bold text-center bg-slate-50 align-middle">ابتدائي</td>
+              </tr>
+              <tr>
+                <td><textarea id="dir_action_middle" data-owner="admin" rows="2" placeholder="توصيات وإجراءات القسم المتوسط..." oninput="handleInput(this)" class="expandable-input border-0 bg-transparent"></textarea></td>
+                <td class="font-bold text-center bg-slate-50 align-middle">متوسط</td>
+              </tr>
+              <tr>
+                <td><textarea id="dir_action_secondary" data-owner="admin" rows="2" placeholder="توصيات وإجراءات القسم الثانوي..." oninput="handleInput(this)" class="expandable-input border-0 bg-transparent"></textarea></td>
+                <td class="font-bold text-center bg-slate-50 align-middle">ثانوي</td>
+              </tr>
+              <tr>
+                <td><textarea id="dir_action_special" data-owner="admin" rows="2" placeholder="توصيات وإجراءات قسم التربية الخاصة..." oninput="handleInput(this)" class="expandable-input border-0 bg-transparent"></textarea></td>
+                <td class="font-bold text-center bg-slate-50 align-middle">تربية خاصة</td>
+              </tr>
+              <tr>
+                <td class="bg-blue-50/30"><textarea id="dir_action_general" data-owner="admin" rows="2" placeholder="توصيات وإجراءات عامة موجهة للإدارة العامة..." oninput="handleInput(this)" class="expandable-input border-0 bg-transparent font-semibold"></textarea></td>
+                <td class="font-bold text-center bg-[#8ea9db] text-slate-900 align-middle">عام</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- التوقيعات الرسمية المعتمدة -->
+      <div class="mt-4 flex justify-between items-center px-4 md:px-8 text-center avoid-page-break">
+        <div>
+          <span class="block text-xs text-slate-500 font-semibold mb-1">الختم الرسمي</span>
+          <div class="w-16 h-12 border-2 border-dashed border-slate-300 rounded mx-auto flex items-center justify-center text-[9px] text-slate-400">ختم الإدارة</div>
+        </div>
+        <div>
+          <span class="block text-xs text-slate-500 font-semibold mb-1">المشرف العام على أقسام البنين</span>
+          <span class="text-sm md:text-base font-bold text-slate-900 border-b-2 border-slate-800 pb-0.5 px-4 inline-block">م . صالح بن خليفه الحربي</span>
+        </div>
+        <div>
+          <span class="block text-xs text-slate-500 font-semibold mb-1">الرئيس التنفيذي للمدارس</span>
+          <span class="text-sm md:text-base font-bold text-slate-900 border-b-2 border-slate-800 pb-0.5 px-4 inline-block">أ . سعد بن مفرح الغامدي</span>
+        </div>
       </div>
     </div>
 
-    <!-- زر محو التقرير بالكامل لبدء أسبوع جديد (أسفل التطبيق وخاص بالمشرف العام) -->
+    <!-- زر محو التقرير بالكامل لبدء أسبوع جديد -->
     <div id="clearFullReportSection" class="no-print mt-10 p-4 border-2 border-dashed border-rose-300 rounded-xl bg-rose-50/50 flex flex-wrap justify-between items-center gap-3 hidden">
       <div>
         <h5 class="text-xs md:text-sm font-bold text-rose-800 flex items-center gap-1.5">
@@ -818,10 +911,10 @@
     try {
       firebase.initializeApp(firebaseConfig);
       db = firebase.database();
-      reportRef = db.ref("reports/week_16");
+      reportRef = db.ref("reports/week_16_v2");
       usersRef = db.ref("system_users");
-      supEntriesRef = db.ref("reports/week_16_supervisors");
-      maintGalleryRef = db.ref("reports/week_16_maint_gallery");
+      supEntriesRef = db.ref("reports/week_16_v2_supervisors");
+      maintGalleryRef = db.ref("reports/week_16_v2_maint_gallery");
     } catch (e) {
       console.warn("Firebase Status:", e);
     }
@@ -834,14 +927,16 @@
       'middle': { pass: 'mid123', role: 'middle', title: 'مدير القسم المتوسط' },
       'secondary': { pass: 'sec123', role: 'secondary', title: 'مدير القسم الثانوي' },
       'special': { pass: 'spe123', role: 'special', title: 'مدير قسم التربية الخاصة' },
-      'supervisor1': { pass: 'sup123', role: 'supervisor', title: 'مشرف تربوي 1' },
-      'supervisor2': { pass: 'sup123', role: 'supervisor', title: 'مشرف تربوي 2' },
-      'supervisor3': { pass: 'sup123', role: 'supervisor', title: 'مشرف تربوي 3' },
-      'supervisor4': { pass: 'sup123', role: 'supervisor', title: 'مشرف تربوي 4' }
+      'subhi': { pass: 'sup123', role: 'supervisor', title: 'أ. صبحي الرفاعي' },
+      'marei': { pass: 'sup123', role: 'supervisor', title: 'د. أحمد مرعي' },
+      'magd': { pass: 'sup123', role: 'supervisor', title: 'د. إبراهيم أبو المجد' },
+      'othman': { pass: 'sup123', role: 'supervisor', title: 'أ. محمد عثمان' },
+      'nemer': { pass: 'sup123', role: 'supervisor', title: 'د. فراس النمر' }
     };
 
     let currentUser = null;
     let allSupervisorData = {};
+    let isReportLockedByAdmin = false;
 
     function cleanValue(val) {
       if (typeof val === 'string') {
@@ -849,6 +944,88 @@
       }
       return val;
     }
+
+    function stepWeekNumber(delta) {
+      const select = document.getElementById('week_no');
+      let currentVal = parseInt(select.value) || 1;
+      let nextVal = currentVal + delta;
+      if (nextVal >= 1 && nextVal <= 18) {
+        select.value = nextVal;
+        handleInput(select);
+      }
+    }
+
+    function calculateWeekDateRange(selectedDateStr) {
+      if (!selectedDateStr) return;
+
+      const dateParts = selectedDateStr.split('-');
+      const pickedDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+
+      const dayOfWeek = pickedDate.getDay();
+      const sunday = new Date(pickedDate);
+      sunday.setDate(pickedDate.getDate() - dayOfWeek);
+
+      const thursday = new Date(sunday);
+      thursday.setDate(sunday.getDate() + 4);
+
+      const getHijriParts = (d) => {
+        const parts = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', {
+          day: 'numeric',
+          month: 'numeric',
+          year: 'numeric'
+        }).formatToParts(d);
+        return {
+          day: parts.find(p => p.type === 'day')?.value || '',
+          month: parts.find(p => p.type === 'month')?.value || '',
+          year: parts.find(p => p.type === 'year')?.value || ''
+        };
+      };
+
+      const hSun = getHijriParts(sunday);
+      const hThu = getHijriParts(thursday);
+
+      const gSunDay = sunday.getDate();
+      const gSunMonth = sunday.getMonth() + 1;
+      const gThuDay = thursday.getDate();
+      const gThuMonth = thursday.getMonth() + 1;
+      const gThuYear = thursday.getFullYear();
+
+      const generatedDateText = `من ${hSun.day} /${hSun.month} - ${hThu.day} / ${hThu.month}/ ${hThu.year}هـ (${gSunDay} /${gSunMonth} - ${gThuDay} / ${gThuMonth} / ${gThuYear}م)`;
+
+      const dateInput = document.getElementById('date_range');
+      dateInput.value = generatedDateText;
+      handleInput(dateInput);
+    }
+
+    function triggerSmartPrint() {
+      prepareDomForPrint();
+      window.print();
+    }
+
+    function prepareDomForPrint() {
+      document.querySelectorAll('textarea').forEach(ta => {
+        let printDiv = ta.nextElementSibling;
+        if (!printDiv || !printDiv.classList.contains('print-text-block')) {
+          printDiv = document.createElement('div');
+          printDiv.className = 'print-text-block';
+          ta.parentNode.insertBefore(printDiv, ta.nextSibling);
+        }
+        printDiv.innerText = ta.value || '-';
+        ta.classList.add('hide-on-print');
+      });
+    }
+
+    function restoreDomAfterPrint() {
+      document.querySelectorAll('.hide-on-print').forEach(el => {
+        el.classList.remove('hide-on-print');
+      });
+      document.querySelectorAll('.print-text-block').forEach(el => {
+        el.remove();
+      });
+    }
+
+    window.onbeforeprint = prepareDomForPrint;
+    window.onafterprint = restoreDomAfterPrint;
 
     function uploadSchoolLogo(e) {
       const file = e.target.files[0];
@@ -920,15 +1097,18 @@
     function handleLogin(e) {
       e.preventDefault();
       const u = document.getElementById('usernameInput').value.trim().toLowerCase();
-      const p = document.getElementById('passwordInput').value.trim();
+      const p = document.getElementById('passwordInput').value;
       const errBox = document.getElementById('loginError');
 
       if (USERS_DB[u] && USERS_DB[u].pass === p) {
         currentUser = USERS_DB[u];
         currentUser.username = u;
-        localStorage.setItem('bayariq_auth_user', u);
         errBox.classList.add('hidden');
         document.getElementById('loginModal').classList.add('hidden');
+        
+        document.getElementById('usernameInput').value = '';
+        document.getElementById('passwordInput').value = '';
+
         applyPermissions(currentUser.role, currentUser.title);
         syncSupervisorTableUI();
       } else {
@@ -937,7 +1117,6 @@
     }
 
     function logout() {
-      localStorage.removeItem('bayariq_auth_user');
       currentUser = null;
       document.getElementById('usernameInput').value = '';
       document.getElementById('passwordInput').value = '';
@@ -956,7 +1135,7 @@
     function saveNewPassword(e) {
       e.preventDefault();
       if (!currentUser) return;
-      const newPass = document.getElementById('newPasswordInput').value.trim();
+      const newPass = document.getElementById('newPasswordInput').value;
       if (!newPass) return;
 
       USERS_DB[currentUser.username].pass = newPass;
@@ -964,31 +1143,56 @@
       if (usersRef) {
         const userUpdate = {};
         userUpdate[currentUser.username] = { pass: newPass };
-        usersRef.update(userUpdate);
+        usersRef.update(userUpdate).then(() => {
+          document.getElementById('passChangeSuccess').classList.remove('hidden');
+          setTimeout(() => {
+            toggleChangePassModal(false);
+          }, 1300);
+        });
+      } else {
+        document.getElementById('passChangeSuccess').classList.remove('hidden');
+        setTimeout(() => {
+          toggleChangePassModal(false);
+        }, 1300);
       }
+    }
 
-      document.getElementById('passChangeSuccess').classList.remove('hidden');
-      setTimeout(() => {
-        toggleChangePassModal(false);
-      }, 1400);
+    function toggleReportLock() {
+      if (!currentUser || currentUser.role !== 'admin') return;
+      const nextLockState = !isReportLockedByAdmin;
+      if (db) {
+        db.ref("reports/week_16_v2_locked").set(nextLockState);
+      }
+      isReportLockedByAdmin = nextLockState;
+      updateLockUI(nextLockState);
+    }
+
+    function updateLockUI(locked) {
+      const banner = document.getElementById('lockStatusBanner');
+      const btnText = document.getElementById('lockBtnText');
+      const btnIcon = document.getElementById('lockBtnIcon');
+      
+      if (locked) {
+        if (banner) banner.classList.remove('hidden');
+        if (btnText) btnText.innerText = 'فتح التعديل';
+        if (btnIcon) btnIcon.innerText = '🔓';
+      } else {
+        if (banner) banner.classList.add('hidden');
+        if (btnText) btnText.innerText = 'قفل التقرير';
+        if (btnIcon) btnIcon.innerText = '🔒';
+      }
+      if (currentUser) applyPermissions(currentUser.role, currentUser.title);
     }
 
     function applyPermissions(role, title) {
       document.getElementById('currentRoleTitle').innerText = title;
-      const allInputs = document.querySelectorAll('input, textarea');
+      const allInputs = document.querySelectorAll('input:not(#usernameInput):not(#passwordInput):not(#newPasswordInput), textarea, select');
 
-      const recCards = ['primary', 'middle', 'secondary', 'special'];
-      recCards.forEach(stage => {
-        const card = document.getElementById(`rec_card_${stage}`);
-        if (!card) return;
-        if (role === 'admin' || role === 'ceo') {
-          card.classList.remove('hidden');
-        } else if (role === stage) {
-          card.classList.remove('hidden');
-        } else {
-          card.classList.add('hidden');
-        }
-      });
+      const lockBtn = document.getElementById('adminLockToggleBtn');
+      if (lockBtn) {
+        if (role === 'admin') lockBtn.classList.remove('hidden');
+        else lockBtn.classList.add('hidden');
+      }
 
       const clearTopBtn = document.getElementById('clearAllTopBtn');
       const clearBottomSection = document.getElementById('clearFullReportSection');
@@ -1000,104 +1204,48 @@
         if (clearBottomSection) clearBottomSection.classList.add('hidden');
       }
 
-      allInputs.forEach(el => {
-        if (el.classList.contains('sup-cell')) {
-          if (role === 'supervisor') {
-            el.removeAttribute('disabled');
-            el.classList.remove('field-locked');
-          } else {
-            el.setAttribute('disabled', 'true');
-            el.classList.add('field-locked');
-          }
-          return;
-        }
-
-        if (role === 'admin') {
-          if (el.getAttribute('data-stage') === 'ceo') {
-            el.setAttribute('disabled', 'true');
-            el.classList.add('field-locked');
-          } else {
-            el.removeAttribute('disabled');
-            el.classList.remove('field-locked');
-          }
-          return;
-        }
-
-        if (role === 'ceo') {
-          if (el.getAttribute('data-stage') === 'ceo') {
-            el.removeAttribute('disabled');
-            el.classList.remove('field-locked');
-          } else {
-            el.setAttribute('disabled', 'true');
-            el.classList.add('field-locked');
-          }
-          return;
-        }
-
-        if (role === 'supervisor') {
+      if (isReportLockedByAdmin && role !== 'admin') {
+        allInputs.forEach(el => {
           el.setAttribute('disabled', 'true');
           el.classList.add('field-locked');
-          return;
-        }
-
-        if (role === 'maintenance') {
-          if (el.closest('[data-stage="maintenance"]')) {
-            el.removeAttribute('disabled');
-            el.classList.remove('field-locked');
-          } else {
-            el.setAttribute('disabled', 'true');
-            el.classList.add('field-locked');
-          }
-          return;
-        }
-
-        const stageParent = el.closest('[data-stage]');
-        if (stageParent) {
-          const allowedStage = stageParent.getAttribute('data-stage');
-          if (allowedStage === role) {
-            el.removeAttribute('disabled');
-            el.classList.remove('field-locked');
-          } else {
-            el.setAttribute('disabled', 'true');
-            el.classList.add('field-locked');
-          }
-        } else {
-          el.setAttribute('disabled', 'true');
-          el.classList.add('field-locked');
-        }
-      });
-    }
-
-    function toggleRewardAction(stage) {
-      if (!currentUser || currentUser.role !== 'admin') {
-        alert('هذا الإجراء متاح حصرياً للمشرف العام!');
+        });
         return;
       }
-      const badge = document.getElementById(`badge_${stage}`);
-      const isReward = badge.innerText.includes('شكر');
-      const actionType = isReward ? 'normal' : 'reward';
-      const data = {};
-      data[`discipline_${stage}`] = actionType;
-      if (reportRef) reportRef.update(data);
-      updateDisciplineBadgeUI(stage, actionType);
-    }
 
-    function updateDisciplineBadgeUI(stage, actionType) {
-      const badge = document.getElementById(`badge_${stage}`);
-      if (!badge) return;
-      if (actionType === 'reward') {
-        badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300';
-        badge.innerText = '🟢 شكر وتقدير';
-      } else {
-        badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded bg-slate-200 text-slate-700';
-        badge.innerText = 'عادي';
+      if (role === 'primary' || role === 'middle' || role === 'secondary' || role === 'special' || role === 'maintenance' || role === 'ceo') {
+        allInputs.forEach(el => {
+          el.setAttribute('disabled', 'true');
+          el.classList.add('field-locked');
+        });
+        return;
+      }
+
+      if (role === 'admin') {
+        allInputs.forEach(el => {
+          el.removeAttribute('disabled');
+          el.classList.remove('field-locked');
+        });
+        return;
+      }
+
+      if (role === 'supervisor') {
+        allInputs.forEach(el => {
+          const isOwnedByAdmin = el.getAttribute('data-owner') === 'admin';
+          if (isOwnedByAdmin) {
+            el.setAttribute('disabled', 'true');
+            el.classList.add('field-locked');
+          } else {
+            el.removeAttribute('disabled');
+            el.classList.remove('field-locked');
+          }
+        });
       }
     }
 
     function setMaintStageStatus(stage, status) {
-      if (!currentUser) return;
-      if (currentUser.role !== 'admin' && currentUser.role !== stage) {
-        alert('يمكن لمدير المرحلة أو المشرف العام فقط تغيير حالة التنفيذ الخاصة بالمرحلة!');
+      if (!currentUser || (isReportLockedByAdmin && currentUser.role !== 'admin')) return;
+      if (currentUser.role !== 'admin' && currentUser.role !== 'supervisor') {
+        alert('التعديل متاح للمشرفين والمشرف العام فقط حالياً!');
         return;
       }
       const data = {};
@@ -1121,40 +1269,13 @@
       }
     }
 
-    function setMaintTeamStatus(stage, status) {
-      if (!currentUser) return;
-      if (currentUser.role !== 'admin' && currentUser.role !== 'maintenance') {
-        alert('متاح حصرياً لمسؤول قسم الصيانة أو المشرف العام!');
-        return;
-      }
-      const data = {};
-      data[`maint_team_status_${stage}`] = status;
-      if (reportRef) reportRef.update(data);
-      updateMaintTeamBadgeUI(stage, status);
-    }
-
-    function updateMaintTeamBadgeUI(stage, status) {
-      const badge = document.getElementById(`maint_team_badge_${stage}`);
-      if (!badge) return;
-      if (status === 'done') {
-        badge.className = 'mt-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300';
-        badge.innerText = '🟢 تم التنفيذ من الصيانة';
-      } else if (status === 'undone') {
-        badge.className = 'mt-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-300';
-        badge.innerText = '🔴 معلّق لدى الصيانة';
-      } else {
-        badge.className = 'mt-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-200 text-slate-700';
-        badge.innerText = 'بانتظار رد الصيانة';
-      }
-    }
-
     function handleInput(el) {
       if (!el.id) return;
       const val = cleanValue(el.value);
 
-      let localData = JSON.parse(localStorage.getItem('bayariq_report_data') || '{}');
+      let localData = JSON.parse(localStorage.getItem('bayariq_report_data_v2') || '{}');
       localData[el.id] = val;
-      localStorage.setItem('bayariq_report_data', JSON.stringify(localData));
+      localStorage.setItem('bayariq_report_data_v2', JSON.stringify(localData));
 
       if (reportRef) {
         const updateObj = {};
@@ -1174,15 +1295,14 @@
           supUpdate[`${currentUser.username}/${el.id}`] = val;
           supEntriesRef.update(supUpdate);
         }
-        let localSup = JSON.parse(localStorage.getItem('bayariq_sup_' + currentUser.username) || '{}');
+        let localSup = JSON.parse(localStorage.getItem('bayariq_sup_v2_' + currentUser.username) || '{}');
         localSup[el.id] = val;
-        localStorage.setItem('bayariq_sup_' + currentUser.username, JSON.stringify(localSup));
+        localStorage.setItem('bayariq_sup_v2_' + currentUser.username, JSON.stringify(localSup));
       }
       showSavedBadge();
       sumSupervisor();
     }
 
-    // زر محو التقرير بالكامل لبدء أسبوع جديد (للمشرف العام)
     function clearFullWeekReport() {
       if (!currentUser || currentUser.role !== 'admin') {
         alert('صلاحية محو التقرير وبدء أسبوع جديد مخصصة حصرياً للمشرف العام!');
@@ -1191,29 +1311,22 @@
       const confirmed = confirm('⚠️ تحذير: هل أنت متأكد من محو جميع بيانات التقرير الحالي وتصفير كل الجداول لبدء أسبوع جديد؟');
       if (!confirmed) return;
 
-      if (reportRef) {
-        reportRef.remove();
-      }
-      if (supEntriesRef) {
-        supEntriesRef.remove();
-      }
-      if (maintGalleryRef) {
-        maintGalleryRef.remove();
-      }
-      localStorage.removeItem('bayariq_report_data');
-      Object.keys(USERS_DB).forEach(u => localStorage.removeItem('bayariq_sup_' + u));
+      if (reportRef) reportRef.remove();
+      if (supEntriesRef) supEntriesRef.remove();
+      if (maintGalleryRef) maintGalleryRef.remove();
+
+      localStorage.removeItem('bayariq_report_data_v2');
+      Object.keys(USERS_DB).forEach(u => localStorage.removeItem('bayariq_sup_v2_' + u));
 
       document.querySelectorAll('input:not([type="password"]), textarea').forEach(el => {
         if (el.id === 'term_info') el.value = 'الفصل الدراسي الثاني';
-        else if (el.id === 'week_no') el.value = '';
+        else if (el.id === 'week_no') el.value = '1';
         else if (el.id === 'date_range') el.value = '';
         else el.value = '';
       });
 
       ['primary', 'middle', 'secondary', 'special'].forEach(st => {
-        updateDisciplineBadgeUI(st, 'normal');
         updateMaintStageBadgeUI(st, 'pending');
-        updateMaintTeamBadgeUI(st, 'pending');
         calcStudentAbsence(st);
       });
 
@@ -1297,14 +1410,14 @@
     }
 
     function manualSave() {
-      const inputs = document.querySelectorAll('input, textarea');
+      const inputs = document.querySelectorAll('input, textarea, select');
       const data = {};
       inputs.forEach(el => {
-        if (el.id && !el.classList.contains('sup-cell') && el.id !== 'maintPhotosInput' && el.id !== 'logoUploadInput') {
+        if (el.id && !el.classList.contains('sup-cell') && el.id !== 'maintPhotosInput' && el.id !== 'logoUploadInput' && el.id !== 'usernameInput' && el.id !== 'passwordInput' && el.id !== 'newPasswordInput' && el.id !== 'weekDatePicker') {
           data[el.id] = cleanValue(el.value);
         }
       });
-      localStorage.setItem('bayariq_report_data', JSON.stringify(data));
+      localStorage.setItem('bayariq_report_data_v2', JSON.stringify(data));
       if (reportRef) reportRef.update(data);
       alert('تم تأكيد حفظ وتزامن جميع بيانات التقرير بنجاح!');
     }
@@ -1319,12 +1432,12 @@
     }
 
     function initDataSync() {
-      const local = localStorage.getItem('bayariq_report_data');
+      const local = localStorage.getItem('bayariq_report_data_v2');
       if (local) {
         const data = JSON.parse(local);
         Object.keys(data).forEach(id => {
           const el = document.getElementById(id);
-          if (el && !el.classList.contains('sup-cell')) {
+          if (el && !el.classList.contains('sup-cell') && el.id !== 'usernameInput' && el.id !== 'passwordInput') {
             el.value = cleanValue(data[id]);
           }
         });
@@ -1341,6 +1454,33 @@
             localStorage.setItem('bayariq_school_logo', logoVal);
           }
         });
+
+        db.ref("reports/week_16_v2_locked").on('value', snap => {
+          isReportLockedByAdmin = snap.val() === true;
+          updateLockUI(isReportLockedByAdmin);
+        });
+
+        db.ref("reports/week_16").once('value').then(oldSnap => {
+          const oldData = oldSnap.val();
+          if (oldData) {
+            reportRef.once('value').then(newSnap => {
+              if (!newSnap.exists()) {
+                reportRef.set(oldData);
+              }
+            });
+          }
+        });
+
+        db.ref("reports/week_16_supervisors").once('value').then(oldSupSnap => {
+          const oldSupData = oldSupSnap.val();
+          if (oldSupData) {
+            supEntriesRef.once('value').then(newSupSnap => {
+              if (!newSupSnap.exists()) {
+                supEntriesRef.set(oldSupData);
+              }
+            });
+          }
+        });
       }
 
       if (reportRef) {
@@ -1349,24 +1489,18 @@
           if (cloudData) {
             Object.keys(cloudData).forEach(id => {
               const el = document.getElementById(id);
-              if (el && document.activeElement !== el && !el.classList.contains('sup-cell')) {
+              if (el && document.activeElement !== el && !el.classList.contains('sup-cell') && el.id !== 'usernameInput' && el.id !== 'passwordInput') {
                 el.value = cleanValue(cloudData[id]);
               }
             });
 
             ['primary', 'middle', 'secondary', 'special'].forEach(st => {
-              if (cloudData[`discipline_${st}`]) {
-                updateDisciplineBadgeUI(st, cloudData[`discipline_${st}`]);
-              }
               if (cloudData[`maint_status_${st}`]) {
                 updateMaintStageBadgeUI(st, cloudData[`maint_status_${st}`]);
               }
-              if (cloudData[`maint_team_status_${st}`]) {
-                updateMaintTeamBadgeUI(st, cloudData[`maint_team_status_${st}`]);
-              }
             });
 
-            localStorage.setItem('bayariq_report_data', JSON.stringify(cloudData));
+            localStorage.setItem('bayariq_report_data_v2', JSON.stringify(cloudData));
             ['primary', 'middle', 'secondary', 'special'].forEach(calcStudentAbsence);
             sumSupervisor();
           }
@@ -1395,7 +1529,7 @@
       if (!currentUser) return;
 
       if (currentUser.role === 'supervisor') {
-        const myData = allSupervisorData[currentUser.username] || JSON.parse(localStorage.getItem('bayariq_sup_' + currentUser.username) || '{}');
+        const myData = allSupervisorData[currentUser.username] || JSON.parse(localStorage.getItem('bayariq_sup_v2_' + currentUser.username) || '{}');
         document.querySelectorAll('.sup-cell').forEach(cell => {
           if (document.activeElement !== cell) {
             cell.value = (myData[cell.id] !== undefined && myData[cell.id] > 0) ? myData[cell.id] : '';
@@ -1468,8 +1602,6 @@
     }
 
     window.onload = function() {
-      localStorage.removeItem('bayariq_report_data');
-
       document.querySelectorAll('input, textarea').forEach(el => {
         if (el.value) el.value = cleanValue(el.value);
       });
@@ -1483,16 +1615,9 @@
       syncUserPasswords();
       initDataSync();
 
-      const savedUser = localStorage.getItem('bayariq_auth_user');
-      if (savedUser && USERS_DB[savedUser]) {
-        currentUser = USERS_DB[savedUser];
-        currentUser.username = savedUser;
-        document.getElementById('loginModal').classList.add('hidden');
-        applyPermissions(currentUser.role, currentUser.title);
-        syncSupervisorTableUI();
-      } else {
-        document.getElementById('loginModal').classList.remove('hidden');
-      }
+      document.getElementById('loginModal').classList.remove('hidden');
+      document.getElementById('usernameInput').value = '';
+      document.getElementById('passwordInput').value = '';
     };
   </script>
 </body>
