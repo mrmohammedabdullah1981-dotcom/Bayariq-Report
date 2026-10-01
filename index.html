@@ -48,7 +48,7 @@
 
     .field-locked {
       background-color: #f8fafc !important;
-      color: #334155 !important;
+      color: #64748b !important;
       cursor: not-allowed !important;
       user-select: text;
     }
@@ -96,6 +96,18 @@
       text-align: center;
     }
 
+    .vertical-header {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      white-space: nowrap;
+      padding: 8px 2px !important;
+      max-height: 140px;
+      font-size: 9.5px !important;
+      line-height: 1.1;
+      letter-spacing: -0.2px;
+      margin: 0 auto;
+    }
+
     @page {
       size: A4 landscape;
       margin: 6mm 5mm;
@@ -115,6 +127,12 @@
       .avoid-break {
         page-break-inside: avoid !important;
         break-inside: avoid !important;
+      }
+
+      .vertical-header {
+        max-height: 120px;
+        font-size: 8.5px !important;
+        padding: 4px 1px !important;
       }
 
       .print-text-block {
@@ -240,11 +258,11 @@
   <!-- جسم التقرير -->
   <main class="max-w-7xl mx-auto p-4 md:p-6 my-4 bg-white rounded-xl shadow print-shadow-none">
 
-    <!-- 1. الهيدر: شعار مدارس البيارق على اليمين والشؤون التعليمية على اليسار -->
+    <!-- 1. الهيدر -->
     <div class="border-t-4 border-black pt-2 pb-2 mb-4 avoid-break">
       <div class="flex justify-between items-center px-1">
         
-        <!-- اليمين: شعار مدارس البيارق مع زر التغيير -->
+        <!-- اليمين: شعار مدارس البيارق -->
         <div class="text-right flex items-center gap-2 relative group">
           <div class="h-14 w-auto flex items-center justify-center" id="logoContainer">
             <div id="defaultLogoSvg" class="flex items-center gap-2">
@@ -342,7 +360,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr data-stage="primary">
               <td class="bg-cell-stage">ابتدائي</td>
               <td><input type="number" id="stu_total_primary" value="293" oninput="handleInput(this); calcStudentAbsence('primary')" class="cell-input-center"></td>
               <td><input type="number" id="stu_sun_primary" value="42" oninput="handleInput(this); calcStudentAbsence('primary')" class="cell-input-center"></td>
@@ -355,7 +373,7 @@
                 <textarea id="admin_action_stu" data-owner="admin" rows="7" placeholder="تدوين إجراءات وتوجيهات إدارة الإشراف التربوي لغياب الطلاب..." oninput="handleInput(this)" class="cell-textarea">هذا الاسبوع يستمر الانتظام الجيد حتى الايام الاولى من الاسبوع تم التاكيد على الاستمرار بحث الحضور ومتابعة اولياء الامور بالاسلوب الامثل لحثهم على الحضور واهميته والاستمرار في تنفيذ برامج القدرات والتسويق لها</textarea>
               </td>
             </tr>
-            <tr>
+            <tr data-stage="middle">
               <td class="bg-cell-stage">متوسط</td>
               <td><input type="number" id="stu_total_middle" value="168" oninput="handleInput(this); calcStudentAbsence('middle')" class="cell-input-center"></td>
               <td><input type="number" id="stu_sun_middle" value="19" oninput="handleInput(this); calcStudentAbsence('middle')" class="cell-input-center"></td>
@@ -365,7 +383,7 @@
               <td><input type="number" id="stu_thu_middle" oninput="handleInput(this); calcStudentAbsence('middle')" class="cell-input-center"></td>
               <td id="stu_perc_middle" class="font-bold bg-slate-50">18.7%</td>
             </tr>
-            <tr>
+            <tr data-stage="secondary">
               <td class="bg-cell-stage">ثانوي</td>
               <td><input type="number" id="stu_total_secondary" value="491" oninput="handleInput(this); calcStudentAbsence('secondary')" class="cell-input-center"></td>
               <td><input type="number" id="stu_sun_secondary" value="175" oninput="handleInput(this); calcStudentAbsence('secondary')" class="cell-input-center"></td>
@@ -375,7 +393,7 @@
               <td><input type="text" id="stu_thu_secondary" value="-" oninput="handleInput(this); calcStudentAbsence('secondary')" class="cell-input-center"></td>
               <td id="stu_perc_secondary" class="font-bold bg-slate-50">34.4%</td>
             </tr>
-            <tr>
+            <tr data-stage="special">
               <td class="bg-cell-stage">تربية خاصة</td>
               <td><input type="number" id="stu_total_special" value="237" oninput="handleInput(this); calcStudentAbsence('special')" class="cell-input-center"></td>
               <td><input type="number" id="stu_sun_special" value="39" oninput="handleInput(this); calcStudentAbsence('special')" class="cell-input-center"></td>
@@ -410,7 +428,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr data-stage="primary">
               <td class="bg-cell-stage">ابتدائي</td>
               <td><textarea id="emp_abs_p_1" placeholder="-" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
               <td><textarea id="emp_abs_p_2" placeholder="-" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
@@ -419,7 +437,7 @@
               <td><textarea id="emp_abs_p_5" placeholder="-" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
               <td><textarea id="emp_abs_act_p" placeholder="المعالجات الإشرافية..." oninput="handleInput(this)" class="cell-textarea"></textarea></td>
             </tr>
-            <tr>
+            <tr data-stage="middle">
               <td class="bg-cell-stage">متوسط</td>
               <td><textarea id="emp_abs_m_1" placeholder="-" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
               <td><textarea id="emp_abs_m_2" placeholder="-" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
@@ -428,7 +446,7 @@
               <td><textarea id="emp_abs_m_5" placeholder="-" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
               <td><textarea id="emp_abs_act_m" placeholder="المعالجات الإشرافية..." oninput="handleInput(this)" class="cell-textarea"></textarea></td>
             </tr>
-            <tr>
+            <tr data-stage="secondary">
               <td class="bg-cell-stage">ثانوي</td>
               <td><textarea id="emp_abs_s_1" placeholder="-" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
               <td><textarea id="emp_abs_s_2" placeholder="-" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
@@ -437,7 +455,7 @@
               <td><textarea id="emp_abs_s_5" placeholder="-" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
               <td><textarea id="emp_abs_act_s" placeholder="المعالجات الإشرافية..." oninput="handleInput(this)" class="cell-textarea"></textarea></td>
             </tr>
-            <tr>
+            <tr data-stage="special">
               <td class="bg-cell-stage">تربية خاصة</td>
               <td><textarea id="emp_abs_sp_1" placeholder="-" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
               <td><textarea id="emp_abs_sp_2" placeholder="-" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
@@ -471,7 +489,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr data-stage="primary">
               <td class="bg-cell-stage">ابتدائي</td>
               <td><textarea id="emp_lat_p_1" placeholder="-" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
               <td><textarea id="emp_lat_p_2" placeholder="-" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
@@ -480,7 +498,7 @@
               <td><textarea id="emp_lat_p_5" placeholder="-" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
               <td><textarea id="emp_lat_act_p" placeholder="المعالجات الإشرافية..." oninput="handleInput(this)" class="cell-textarea"></textarea></td>
             </tr>
-            <tr>
+            <tr data-stage="middle">
               <td class="bg-cell-stage">متوسط</td>
               <td><textarea id="emp_lat_m_1" placeholder="-" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
               <td><textarea id="emp_lat_m_2" placeholder="-" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
@@ -489,7 +507,7 @@
               <td><textarea id="emp_lat_m_5" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
               <td><textarea id="emp_lat_act_m" placeholder="المعالجات الإشرافية..." oninput="handleInput(this)" class="cell-textarea"></textarea></td>
             </tr>
-            <tr>
+            <tr data-stage="secondary">
               <td class="bg-cell-stage">ثانوي</td>
               <td><textarea id="emp_lat_s_1" placeholder="-" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
               <td><textarea id="emp_lat_s_2" placeholder="-" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
@@ -498,7 +516,7 @@
               <td><textarea id="emp_lat_s_5" placeholder="-" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
               <td><textarea id="emp_lat_act_s" placeholder="المعالجات الإشرافية..." oninput="handleInput(this)" class="cell-textarea"></textarea></td>
             </tr>
-            <tr>
+            <tr data-stage="special">
               <td class="bg-cell-stage">تربية خاصة</td>
               <td><textarea id="emp_lat_sp_1" placeholder="-" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
               <td><textarea id="emp_lat_sp_2" placeholder="-" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
@@ -531,24 +549,24 @@
           <tbody>
             <tr>
               <td class="bg-cell-pink font-bold">الحالات الصحية</td>
-              <td><textarea id="guid_h_p" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
-              <td><textarea id="guid_h_m" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
-              <td><textarea id="guid_h_s" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
-              <td><textarea id="guid_h_sp" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
+              <td><textarea id="guid_h_p" data-stage="primary" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
+              <td><textarea id="guid_h_m" data-stage="middle" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
+              <td><textarea id="guid_h_s" data-stage="secondary" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
+              <td><textarea id="guid_h_sp" data-stage="special" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
             </tr>
             <tr>
               <td class="bg-cell-green font-bold">الحالات النفسية</td>
-              <td><textarea id="guid_p_p" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
-              <td><textarea id="guid_p_m" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
-              <td><textarea id="guid_p_s" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
-              <td><textarea id="guid_p_sp" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
+              <td><textarea id="guid_p_p" data-stage="primary" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
+              <td><textarea id="guid_p_m" data-stage="middle" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
+              <td><textarea id="guid_p_s" data-stage="secondary" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
+              <td><textarea id="guid_p_sp" data-stage="special" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
             </tr>
             <tr>
               <td class="bg-cell-pink font-bold">البرامج الارشادية<br>المقدمة</td>
-              <td><textarea id="guid_prog_p" rows="3" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
-              <td><textarea id="guid_prog_m" rows="3" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
-              <td><textarea id="guid_prog_s" rows="3" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
-              <td><textarea id="guid_prog_sp" rows="3" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
+              <td><textarea id="guid_prog_p" data-stage="primary" rows="3" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
+              <td><textarea id="guid_prog_m" data-stage="middle" rows="3" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
+              <td><textarea id="guid_prog_s" data-stage="secondary" rows="3" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
+              <td><textarea id="guid_prog_sp" data-stage="special" rows="3" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
             </tr>
             <tr>
               <td class="bg-cell-blue font-bold">تقييم الإشراف</td>
@@ -584,10 +602,10 @@
           <tbody>
             <tr>
               <td class="bg-cell-green font-bold">البرامج</td>
-              <td><textarea id="act_p" rows="3" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
-              <td><textarea id="act_m" rows="3" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
-              <td><textarea id="act_s" rows="3" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
-              <td><textarea id="act_sp" rows="3" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
+              <td><textarea id="act_p" data-stage="primary" rows="3" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
+              <td><textarea id="act_m" data-stage="middle" rows="3" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
+              <td><textarea id="act_s" data-stage="secondary" rows="3" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
+              <td><textarea id="act_sp" data-stage="special" rows="3" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
             </tr>
             <tr>
               <td class="bg-cell-blue font-bold">تقييم الإشراف</td>
@@ -620,10 +638,10 @@
           <tbody>
             <tr>
               <td class="bg-header-peach font-bold">البرامج</td>
-              <td><textarea id="skill_p" rows="3" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
-              <td><textarea id="skill_m" rows="3" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
-              <td><textarea id="skill_s" rows="3" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
-              <td><textarea id="skill_sp" rows="3" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
+              <td><textarea id="skill_p" data-stage="primary" rows="3" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
+              <td><textarea id="skill_m" data-stage="middle" rows="3" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
+              <td><textarea id="skill_s" data-stage="secondary" rows="3" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
+              <td><textarea id="skill_sp" data-stage="special" rows="3" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
             </tr>
             <tr>
               <td class="bg-cell-blue font-bold">تقييم الإشراف</td>
@@ -637,7 +655,7 @@
       </div>
     </section>
 
-    <!-- 7. البرامج المقدمة من قبل مدير المدرسة والوكيل : -->
+    <!-- 7. البرامج المقدمة من قبل مدير المدرسة والوكيل : (تم تصحيح الصلاحيات و data-stage هنا بالكامل) -->
     <section class="mb-6 avoid-break">
       <div class="section-title-olive">
         <span>البرامج المقدمة من قبل مدير المدرسة والوكيل :</span>
@@ -656,31 +674,31 @@
           <tbody>
             <tr>
               <td class="bg-cell-stage font-bold">تكريم وتحفيز<br>للموظفين</td>
-              <td><textarea id="adm_rew_p" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
-              <td><textarea id="adm_rew_m" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
-              <td><textarea id="adm_rew_s" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
-              <td><textarea id="adm_rew_sp" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
+              <td><textarea id="adm_rew_p" data-stage="primary" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
+              <td><textarea id="adm_rew_m" data-stage="middle" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
+              <td><textarea id="adm_rew_s" data-stage="secondary" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
+              <td><textarea id="adm_rew_sp" data-stage="special" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
             </tr>
             <tr>
               <td class="bg-cell-stage font-bold">النمو المهني</td>
-              <td><textarea id="adm_dev_p" rows="2" oninput="handleInput(this)" class="cell-textarea text-center"></textarea></td>
-              <td><textarea id="adm_dev_m" rows="2" oninput="handleInput(this)" class="cell-textarea text-center"></textarea></td>
-              <td><textarea id="adm_dev_s" rows="2" oninput="handleInput(this)" class="cell-textarea text-center"></textarea></td>
-              <td><textarea id="adm_dev_sp" rows="2" oninput="handleInput(this)" class="cell-textarea text-center"></textarea></td>
+              <td><textarea id="adm_dev_p" data-stage="primary" rows="2" oninput="handleInput(this)" class="cell-textarea text-center"></textarea></td>
+              <td><textarea id="adm_dev_m" data-stage="middle" rows="2" oninput="handleInput(this)" class="cell-textarea text-center"></textarea></td>
+              <td><textarea id="adm_dev_s" data-stage="secondary" rows="2" oninput="handleInput(this)" class="cell-textarea text-center"></textarea></td>
+              <td><textarea id="adm_dev_sp" data-stage="special" rows="2" oninput="handleInput(this)" class="cell-textarea text-center"></textarea></td>
             </tr>
             <tr>
               <td class="bg-cell-stage font-bold">الزيارات الصفية<br>للمدير</td>
-              <td><textarea id="adm_vis_dir_p" rows="2" oninput="handleInput(this)" class="cell-textarea text-center"></textarea></td>
-              <td><textarea id="adm_vis_dir_m" rows="2" oninput="handleInput(this)" class="cell-textarea text-center"></textarea></td>
-              <td><textarea id="adm_vis_dir_s" rows="2" oninput="handleInput(this)" class="cell-textarea text-center"></textarea></td>
-              <td><textarea id="adm_vis_dir_sp" rows="2" oninput="handleInput(this)" class="cell-textarea text-center"></textarea></td>
+              <td><textarea id="adm_vis_dir_p" data-stage="primary" rows="2" oninput="handleInput(this)" class="cell-textarea text-center"></textarea></td>
+              <td><textarea id="adm_vis_dir_m" data-stage="middle" rows="2" oninput="handleInput(this)" class="cell-textarea text-center"></textarea></td>
+              <td><textarea id="adm_vis_dir_s" data-stage="secondary" rows="2" oninput="handleInput(this)" class="cell-textarea text-center"></textarea></td>
+              <td><textarea id="adm_vis_dir_sp" data-stage="special" rows="2" oninput="handleInput(this)" class="cell-textarea text-center"></textarea></td>
             </tr>
             <tr>
               <td class="bg-cell-stage font-bold">الزيارات الصفية<br>للوكيل</td>
-              <td><textarea id="adm_vis_v_p" rows="2" oninput="handleInput(this)" class="cell-textarea text-center"></textarea></td>
-              <td><textarea id="adm_vis_v_m" rows="2" oninput="handleInput(this)" class="cell-textarea text-center"></textarea></td>
-              <td><textarea id="adm_vis_v_s" rows="2" oninput="handleInput(this)" class="cell-textarea text-center"></textarea></td>
-              <td><textarea id="adm_vis_v_sp" rows="2" oninput="handleInput(this)" class="cell-textarea text-center"></textarea></td>
+              <td><textarea id="adm_vis_v_p" data-stage="primary" rows="2" oninput="handleInput(this)" class="cell-textarea text-center"></textarea></td>
+              <td><textarea id="adm_vis_v_m" data-stage="middle" rows="2" oninput="handleInput(this)" class="cell-textarea text-center"></textarea></td>
+              <td><textarea id="adm_vis_v_s" data-stage="secondary" rows="2" oninput="handleInput(this)" class="cell-textarea text-center"></textarea></td>
+              <td><textarea id="adm_vis_v_sp" data-stage="special" rows="2" oninput="handleInput(this)" class="cell-textarea text-center"></textarea></td>
             </tr>
             <tr>
               <td class="bg-cell-blue font-bold">تقييم الإشراف</td>
@@ -717,14 +735,14 @@
           <tbody>
             <tr>
               <td class="bg-cell-stage font-bold">نوع الصيانة</td>
-              <td><textarea id="maint_work_primary" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
-              <td><input type="text" id="maint_status_p" placeholder="✓ / ×" oninput="handleInput(this)" class="cell-input-center"></td>
-              <td><textarea id="maint_work_middle" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
-              <td><input type="text" id="maint_status_m" placeholder="✓ / ×" oninput="handleInput(this)" class="cell-input-center"></td>
-              <td><textarea id="maint_work_secondary" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
-              <td><input type="text" id="maint_status_s" placeholder="✓ / ×" oninput="handleInput(this)" class="cell-input-center"></td>
-              <td><textarea id="maint_work_special" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
-              <td><input type="text" id="maint_status_sp" placeholder="✓ / ×" oninput="handleInput(this)" class="cell-input-center"></td>
+              <td><textarea id="maint_work_primary" data-stage="primary" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
+              <td><input type="text" id="maint_status_p" data-stage="primary" placeholder="✓ / ×" oninput="handleInput(this)" class="cell-input-center"></td>
+              <td><textarea id="maint_work_middle" data-stage="middle" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
+              <td><input type="text" id="maint_status_m" data-stage="middle" placeholder="✓ / ×" oninput="handleInput(this)" class="cell-input-center"></td>
+              <td><textarea id="maint_work_secondary" data-stage="secondary" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
+              <td><input type="text" id="maint_status_s" data-stage="secondary" placeholder="✓ / ×" oninput="handleInput(this)" class="cell-input-center"></td>
+              <td><textarea id="maint_work_special" data-stage="special" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
+              <td><input type="text" id="maint_status_sp" data-stage="special" placeholder="✓ / ×" oninput="handleInput(this)" class="cell-input-center"></td>
             </tr>
             <tr>
               <td class="bg-cell-blue font-bold">ملاحظات الإشراف</td>
@@ -756,24 +774,24 @@
           <table class="table-albayariq" id="supervisionTable">
             <thead>
               <tr class="text-[9.5px]">
-                <th class="bg-header-olive w-16">اليوم</th>
-                <th class="bg-header-purple">لقاء المدراء/ت</th>
-                <th class="bg-header-purple">بيئة مدرسية</th>
-                <th class="bg-header-purple">لقاء فردي معلمين</th>
-                <th class="bg-header-purple">ورشة عمل</th>
-                <th class="bg-header-purple">زيارة صفية ومداولة</th>
-                <th class="bg-header-purple">أعمال كتابية</th>
-                <th class="bg-header-purple">متابعة تحضير الدروس</th>
-                <th class="bg-header-purple">متابعة كتب وواجبات</th>
-                <th class="bg-header-purple">زيارات تبادلية</th>
-                <th class="bg-header-purple">مجتمعات تعلم</th>
-                <th class="bg-header-purple">تقويمات متنوعة</th>
-                <th class="bg-header-purple">روابط تفاعلية</th>
-                <th class="bg-header-purple">متابعة منصة البيارق</th>
-                <th class="bg-header-purple">برنامج تدريبي</th>
-                <th class="bg-header-purple">برامج وتجارب إشرافية</th>
-                <th class="bg-header-purple">جولات تفقدية</th>
-                <th class="bg-header-purple">تكريم وتحفيز</th>
+                <th class="bg-header-olive w-16 font-bold">اليوم</th>
+                <th class="bg-header-purple"><div class="vertical-header">لقاء المدراء - اجتماع</div></th>
+                <th class="bg-header-purple"><div class="vertical-header">متابعة البيئة المدرسية - الجودة</div></th>
+                <th class="bg-header-purple"><div class="vertical-header">زيارة صفية - سريعة</div></th>
+                <th class="bg-header-purple"><div class="vertical-header">لقاء فردي معلمين</div></th>
+                <th class="bg-header-purple"><div class="vertical-header">زيارات تبادلية - درس تطبيقي</div></th>
+                <th class="bg-header-purple"><div class="vertical-header">مداولة إشرافية</div></th>
+                <th class="bg-header-purple"><div class="vertical-header">متابعة منصة البيارق</div></th>
+                <th class="bg-header-purple"><div class="vertical-header">متابعة أعمال كتابية</div></th>
+                <th class="bg-header-purple"><div class="vertical-header">مجتمعات تعلم</div></th>
+                <th class="bg-header-purple"><div class="vertical-header">تحكيم اختبارات – ورق عمل</div></th>
+                <th class="bg-header-purple"><div class="vertical-header">تقويمات متنوعة</div></th>
+                <th class="bg-header-purple"><div class="vertical-header">روابط تفاعلية – قراءة موجهة</div></th>
+                <th class="bg-header-purple"><div class="vertical-header">ورشة عمل</div></th>
+                <th class="bg-header-purple"><div class="vertical-header">برنامج تدريبي</div></th>
+                <th class="bg-header-purple"><div class="vertical-header">متابعة برامج تعليمية</div></th>
+                <th class="bg-header-purple"><div class="vertical-header">تكريم و تحفيز</div></th>
+                <th class="bg-header-purple"><div class="vertical-header">مقابلات معلمين</div></th>
               </tr>
             </thead>
             <tbody>
@@ -857,6 +875,7 @@
                 <td><input type="number" id="sup_3_15" class="cell-input-center sup-cell" oninput="handleSupInput(this)"></td>
                 <td><input type="number" id="sup_3_16" class="cell-input-center sup-cell" oninput="handleSupInput(this)"></td>
               </tr>
+              <!-- الخميس -->
               <tr data-day="thu">
                 <td class="bg-cell-stage font-bold">الخميس</td>
                 <td><input type="number" id="sup_4_0" class="cell-input-center sup-cell" oninput="handleSupInput(this)"></td>
@@ -919,14 +938,14 @@
             </thead>
             <tbody>
               <tr>
-                <td><textarea id="final_actions_1" data-owner="admin" rows="2" placeholder="سجل التوصيات..." oninput="handleInput(this)" class="cell-textarea"></textarea></td>
-                <td><textarea id="final_notes_1" data-owner="admin" rows="2" placeholder="سجل الملاحظات..." oninput="handleInput(this)" class="cell-textarea"></textarea></td>
-                <td><textarea id="final_positives_1" data-owner="admin" rows="2" placeholder="سجل الإيجابيات..." oninput="handleInput(this)" class="cell-textarea"></textarea></td>
+                <td><textarea id="final_actions_1" data-owner="admin" rows="2" placeholder="سجل التوصيات..." oninput="handleInput(this)" class="expandable-input border-0 bg-transparent"></textarea></td>
+                <td><textarea id="final_notes_1" data-owner="admin" rows="2" placeholder="سجل الملاحظات..." oninput="handleInput(this)" class="expandable-input border-0 bg-transparent"></textarea></td>
+                <td><textarea id="final_positives_1" data-owner="admin" rows="2" placeholder="سجل الإيجابيات..." oninput="handleInput(this)" class="expandable-input border-0 bg-transparent"></textarea></td>
               </tr>
               <tr>
-                <td><textarea id="final_actions_2" data-owner="admin" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
-                <td><textarea id="final_notes_2" data-owner="admin" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
-                <td><textarea id="final_positives_2" data-owner="admin" rows="2" oninput="handleInput(this)" class="cell-textarea"></textarea></td>
+                <td><textarea id="final_actions_2" data-owner="admin" rows="2" oninput="handleInput(this)" class="expandable-input border-0 bg-transparent"></textarea></td>
+                <td><textarea id="final_notes_2" data-owner="admin" rows="2" oninput="handleInput(this)" class="expandable-input border-0 bg-transparent"></textarea></td>
+                <td><textarea id="final_positives_2" data-owner="admin" rows="2" oninput="handleInput(this)" class="expandable-input border-0 bg-transparent"></textarea></td>
               </tr>
             </tbody>
           </table>
@@ -969,7 +988,7 @@
         </div>
       </section>
 
-      <!-- اعتماد المشرف العام فقط (في المنتصف) -->
+      <!-- اعتماد المشرف العام فقط -->
       <div class="mt-6 flex justify-center items-center text-center avoid-break">
         <div class="inline-block px-12 py-2">
           <span class="block text-xs font-bold text-slate-600 mb-1">المشرف العام على أقسام البنين</span>
@@ -1301,14 +1320,7 @@
         return;
       }
 
-      if (role === 'primary' || role === 'middle' || role === 'secondary' || role === 'special' || role === 'maintenance' || role === 'ceo') {
-        allInputs.forEach(el => {
-          el.setAttribute('disabled', 'true');
-          el.classList.add('field-locked');
-        });
-        return;
-      }
-
+      // 1. المشرف العام
       if (role === 'admin') {
         allInputs.forEach(el => {
           el.removeAttribute('disabled');
@@ -1317,10 +1329,46 @@
         return;
       }
 
+      // 2. الرئيس التنفيذي ومسؤول الصيانة: قراءة واطلاع فقط
+      if (role === 'ceo' || role === 'maintenance') {
+        allInputs.forEach(el => {
+          el.setAttribute('disabled', 'true');
+          el.classList.add('field-locked');
+        });
+        return;
+      }
+
+      // 3. مدراء المراحل
+      const stageRoles = ['primary', 'middle', 'secondary', 'special'];
+      if (stageRoles.includes(role)) {
+        allInputs.forEach(el => {
+          const isOwnedByAdmin = el.getAttribute('data-owner') === 'admin';
+          if (isOwnedByAdmin || el.classList.contains('sup-cell') || el.id === 'term_info' || el.id === 'week_no' || el.id === 'date_range') {
+            el.setAttribute('disabled', 'true');
+            el.classList.add('field-locked');
+            return;
+          }
+
+          const directStage = el.getAttribute('data-stage');
+          const parentStage = el.closest('[data-stage]') ? el.closest('[data-stage]').getAttribute('data-stage') : null;
+          const targetStage = directStage || parentStage;
+
+          if (targetStage === role) {
+            el.removeAttribute('disabled');
+            el.classList.remove('field-locked');
+          } else {
+            el.setAttribute('disabled', 'true');
+            el.classList.add('field-locked');
+          }
+        });
+        return;
+      }
+
+      // 4. فريق المشرفين التربويين
       if (role === 'supervisor') {
         allInputs.forEach(el => {
           const isOwnedByAdmin = el.getAttribute('data-owner') === 'admin';
-          if (isOwnedByAdmin) {
+          if (isOwnedByAdmin || el.id === 'term_info' || el.id === 'week_no' || el.id === 'date_range') {
             el.setAttribute('disabled', 'true');
             el.classList.add('field-locked');
           } else {
